@@ -53,6 +53,10 @@ def add_user(user_id: str) -> HouseMemberData | SQLAlchemyError:
             house = db.query(Houses).first()
             if house is None:
                 raise SQLAlchemyError("[House] House is not initialized.")
+            house_member = db.query(HouseMember).filter(
+                HouseMember.houseId == house.houseId, HouseMember.userId == user_id).first()
+            if house_member is not None:
+                return house_member.get_data()
             new_house_member = HouseMember(
                 userId=user_id, houseId=house.houseId)
             db.add(new_house_member)
