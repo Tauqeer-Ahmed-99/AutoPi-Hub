@@ -76,7 +76,7 @@ def house_login(userId: str, password: str):
             "message": f"Logged into the house and user with id '{userId}' added as a member.",
             "data": house_member.to_dict()
         },
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE
+        status_code=status.HTTP_201_CREATED
     )
 
 
