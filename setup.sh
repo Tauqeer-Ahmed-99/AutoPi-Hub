@@ -28,6 +28,8 @@ source venv/bin/activate
 # Upgrade pip to the latest version
 pip install --upgrade pip
 
+pip install "fastapi[standard]"
+
 # Install project dependencies
 pip install -r requirements.txt
 
