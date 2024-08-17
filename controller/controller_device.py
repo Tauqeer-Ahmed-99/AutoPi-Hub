@@ -10,7 +10,7 @@ from helpers.data_models import House, Room, Device
 
 class ControllerDevice:
 
-    house: House
+    house: House | None = None
 
     def __init__(self):
         try:
@@ -35,7 +35,6 @@ class ControllerDevice:
             if self.house is not None:
                 for room in self.house.rooms:
                     for device in room.devices:
-                        pass
                         device.output_device = OutputDevice(
                             device.pin_number, active_high=False)
         except Exception as e:
@@ -43,24 +42,27 @@ class ControllerDevice:
             raise
 
     def add_room(self, room: Room):
-        self.house.rooms.append(room)
+        if self.house is not None:
+            self.house.rooms.append(room)
 
     def get_room(self, id: str):
         try:
-            for room in self.house.rooms:
-                if room.room_id == id:
-                    return room
+            if self.house is not None:
+                for room in self.house.rooms:
+                    if room.room_id == id:
+                        return room
         except Exception as e:
             print(f"Error getting room: {e}")
             return None
 
     def remove_room(self, room_id: str):
-        room = self.get_room(room_id)
-        if room is not None:
-            for device in room.devices:
-                if device.output_device is not None:
-                    device.output_device.close()
-            self.house.rooms.remove(room)
+        if self.house is not None:
+            room = self.get_room(room_id)
+            if room is not None:
+                for device in room.devices:
+                    if device.output_device is not None:
+                        device.output_device.close()
+                self.house.rooms.remove(room)
 
     def add_device(self, device: Device):
         room = self.get_room(device.room_id)
@@ -71,21 +73,23 @@ class ControllerDevice:
 
     def get_device(self, id: str):
         try:
-            for room in self.house.rooms:
-                for device in room.devices:
-                    if device.device_id == id:
-                        return device
+            if self.house is not None:
+                for room in self.house.rooms:
+                    for device in room.devices:
+                        if device.device_id == id:
+                            return device
         except Exception as e:
             print(f"Error getting device: {e}")
             return None
 
-    def get_scheduled_devices(self) -> List[Device]:
+    def get_scheduled_devices(self) -> List[Device] | None:
         scheduled_devices: List[Device] = []
-        for room in self.house.rooms:
-            for device in room.devices:
-                if device.is_scheduled:
-                    scheduled_devices.append(device)
-        return scheduled_devices
+        if self.house is not None:
+            for room in self.house.rooms:
+                for device in room.devices:
+                    if device.is_scheduled:
+                        scheduled_devices.append(device)
+            return scheduled_devices
 
     def switch_device(self, id: str, status: bool):
         try:
