@@ -32,11 +32,12 @@ class ControllerDevice:
 
     def initialize_output_devices(self):
         try:
-            print(self.house)
-            for room in self.house.rooms:
-                for device in room.devices:
-                    device.output_device = OutputDevice(
-                        device.pin_number, active_high=False)
+            if self.house is not None:
+                for room in self.house.rooms:
+                    for device in room.devices:
+                        pass
+                        device.output_device = OutputDevice(
+                            device.pin_number, active_high=False)
         except Exception as e:
             print(f"Error initializing output devices: {e}")
             raise
