@@ -40,7 +40,7 @@ class SystemInitializer():
                 print("Password must be at least 8 characters long. Please try again.")
 
     def hash_password(self, password: str):
-        salt = bcrypt.gensalt(2)
+        salt = bcrypt.gensalt(10)
         hashed_pw = bcrypt.hashpw(password.encode('utf-8'), salt)
         return hashed_pw
 
