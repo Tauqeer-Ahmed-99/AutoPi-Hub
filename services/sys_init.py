@@ -16,6 +16,7 @@ class SystemInitializer():
         self.initialize_house()
 
     def initialize_house(self):
+        PrintHeading(80)
         house = get_house()
         if isinstance(house, SQLAlchemyError):
             raise Exception("[House] Retrieve House failed.")
@@ -53,3 +54,33 @@ class SystemInitializer():
             print(f"[House] House is not initialized.")
             return None
         return bcrypt.checkpw(password.encode('utf-8'), house.house_password_hash.encode("utf-8"))
+
+
+class PrintHeading():
+
+    def __init__(self, width=40, init_heading="Welcome",  heading="""RPi HAS
+    The Home Automation System""", sub_heading="Create New House") -> None:
+        self.print_heading(width, init_heading, heading, sub_heading)
+
+    def print_centered(self, text, width):
+        """Prints text centered within a specified width."""
+        print(text.center(width))
+
+    def print_frame(self, text, width):
+        """Prints text inside a frame of a specified width."""
+        print('+' + '-' * (width - 2) + '+')
+        self.print_centered(text, width)
+        print('+' + '-' * (width - 2) + '+')
+
+    def print_italic(self, text):
+        """Simulate italic text by using underscores for slant."""
+        for line in text.splitlines():
+            print(f"\033[3m{line}\033[0m")  # ANSI escape code for italic text
+
+    def print_heading(self, width: int, init_heading: str, heading: str, sub_heading: str):
+        # Frame with "Welcome" centered
+        self.print_frame(init_heading, width)
+        # Main heading in italic
+        self.print_italic(heading)
+        # Frame with "Create New House" centered
+        self.print_frame(sub_heading, width)
