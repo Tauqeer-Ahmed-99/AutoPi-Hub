@@ -16,13 +16,13 @@ sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
 sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
 
 # Install Python3 and pip
-sudo apt-get install python3 python3-pip -y
+sudo apt-get install python3 python3-pip -y 
 
 # Install Python virtual environment
-sudo pip3 install virtualenv
+sudo apt install python3-venv
 
 # Create and activate a virtual environment
-virtualenv venv
+python3 -m venv venv
 source venv/bin/activate
 
 # Install project dependencies
