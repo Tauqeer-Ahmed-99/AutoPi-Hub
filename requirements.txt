@@ -2,6 +2,6 @@ fastapi==0.112.1
 gpiozero==2.0
 ntplib==0.4.0
 pydantic==2.8.2
-psycopg2==2.9.9
+psycopg2-binary==2.9.9
 SQLAlchemy==2.0.32
 alembic==1.13.2
