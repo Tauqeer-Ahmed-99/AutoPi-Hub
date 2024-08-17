@@ -58,6 +58,7 @@ class Room():
 class House():
     house_id: str
     house_name: str
+    house_password_hash: str
     created_at: str
     updated_at: str
     rooms: List[Room]

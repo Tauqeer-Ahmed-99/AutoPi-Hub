@@ -1,4 +1,3 @@
-from re import S
 from typing import List
 from gpiozero import OutputDevice
 

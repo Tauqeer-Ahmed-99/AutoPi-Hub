@@ -28,6 +28,7 @@ class Houses(Base):
         house = House()
         house.house_id = str(self.houseId)
         house.house_name = str(self.houseName)
+        house.house_password_hash = str(self.passwordHash)
         house.created_at = str(self.createdAt)
         house.updated_at = str(self.updatedAt)
         house.rooms = [room.get_data() for room in self.rooms]

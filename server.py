@@ -5,12 +5,16 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from controller.controller_device import ControllerDevice
 
-from database.actions import get_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data
+from database.actions import add_user, get_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data
 
 from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest
 
+from services.sys_init import SystemInitializer
 from services.schedule import ScheduleDeviceAssistant
 from services.scheduled_device import get_scheduled_device_status
+
+
+sys = SystemInitializer()
 
 
 app = FastAPI()
@@ -19,8 +23,61 @@ app = FastAPI()
 controller_device = ControllerDevice()
 
 
-schedule_assistant = ScheduleDeviceAssistant(
-    controller_device.get_scheduled_devices())
+scheduled_devices = controller_device.get_scheduled_devices()
+scheduled_devices = scheduled_devices if scheduled_devices is not None else []
+schedule_assistant = ScheduleDeviceAssistant(scheduled_devices)
+
+
+@app.post("/house-login/{userId}/{password}", status_code=status.HTTP_201_CREATED)
+def house_login(userId: str, password: str):
+    if not is_valid_request([userId, password]):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "message": "Please provide userId and password."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    is_authenticated = sys.house_login(password)
+
+    if is_authenticated is None:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "message": "House is not initialized."
+            },
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE
+        )
+
+    if not is_authenticated:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "message": "Password was wrong."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    house_member = add_user(userId)
+
+    if isinstance(house_member, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "message": house_member._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "message": f"Logged into the house and user with id '{userId}' added as a member.",
+            "data": house_member.to_dict()
+        },
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE
+    )
 
 
 @app.get("/get-house/{userId}", status_code=status.HTTP_200_OK)

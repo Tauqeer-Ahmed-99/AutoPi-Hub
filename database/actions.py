@@ -9,6 +9,63 @@ from helpers.data_models import HouseMember as HouseMemberData, Room as RoomData
 from services.scheduled_device import get_scheduled_device_status
 
 
+def init_house_db(house_password_hash: str):
+    db = get_db()
+    try:
+        with db.begin() as txn:  # Automatically handles commit/rollback
+            # Use `first()` to avoid IndexError
+            new_house = Houses(houseName="My House",
+                               passwordHash=house_password_hash)
+            db.add(new_house)
+            db.flush()
+            return new_house.get_data()
+    except SQLAlchemyError as SQLError:
+        print("[DB] Initializing House Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
+def get_house() -> HouseData | None | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:  # Automatically handles commit/rollback
+            # Use `first()` to avoid IndexError
+            house = db.query(Houses).first()
+            if house is None:
+                print("[House] House is not initialized.")
+            db.flush()
+            return house.get_data() if house is not None else None
+    except SQLAlchemyError as SQLError:
+        print("[DB] Retrieving House Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
+def add_user(user_id: str) -> HouseMemberData | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:  # Automatically handles commit/rollback
+            # Use `first()` to avoid IndexError
+            house = db.query(Houses).first()
+            if house is None:
+                raise SQLAlchemyError("[House] House is not initialized.")
+            new_house_member = HouseMember(
+                userId=user_id, houseId=house.houseId)
+            db.add(new_house_member)
+            db.flush()
+            return new_house_member.get_data()
+    except SQLAlchemyError as SQLError:
+        print("[DB] Adding House Member Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
 def get_user(user_id: str) -> HouseMemberData | None | SQLAlchemyError:
     db = get_db()
     try:
