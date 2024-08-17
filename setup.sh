@@ -35,4 +35,4 @@ alembic revision --autogenerate -m "RPi_HAS"
 alembic upgrade head
 
 # Start the Python server
-python server.py 
+fastapi run server.py 

@@ -1,6 +1,2 @@
 # Install Git
-sudo apt-get install git -y 
-
-# Clone the GitHub repository
-git clone <your-repo-url>
-cd <your-repo-folder>
+sudo apt-get install git -y && git clone https://github.com/Tauqeer-Ahmed-99/RPi_HAS.git && cd ./RPi_HAS && ./setup.sh
