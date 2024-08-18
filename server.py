@@ -69,7 +69,7 @@ def get_house_member(userId: str):
             "message": f"House member with id '{userId}' found.",
             "data": house_member.to_dict()
         },
-        status_code=status.HTTP_201_CREATED
+        status_code=status.HTTP_200_OK
     )
 
 
