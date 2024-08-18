@@ -28,7 +28,7 @@ scheduled_devices = scheduled_devices if scheduled_devices is not None else []
 schedule_assistant = ScheduleDeviceAssistant(scheduled_devices)
 
 
-@app.post("/house-login/{userId}/{password}", status_code=status.HTTP_201_CREATED)
+@app.post("/house-login", status_code=status.HTTP_201_CREATED)
 def house_login(userId: str, password: str):
     if not is_valid_request([userId, password]):
         return JSONResponse(
@@ -80,7 +80,7 @@ def house_login(userId: str, password: str):
     )
 
 
-@app.get("/get-house/{userId}", status_code=status.HTTP_200_OK)
+@app.get("/get-house", status_code=status.HTTP_200_OK)
 def get_house_details(userId: str):
     if not is_valid_request([userId]):
         return JSONResponse(
