@@ -28,6 +28,51 @@ scheduled_devices = scheduled_devices if scheduled_devices is not None else []
 schedule_assistant = ScheduleDeviceAssistant(scheduled_devices)
 
 
+@app.get("/get-house-member", status_code=status.HTTP_200_OK)
+def get_house_member(userId: str):
+    if not is_valid_request([userId]):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
+                "message": "Please provide userId."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    house_member = get_user(userId)
+
+    if isinstance(house_member, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": house_member._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    if house_member is None:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
+                "message": f"House member with id '{userId}' not found."
+            },
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+            "message": f"House member with id '{userId}' found.",
+            "data": house_member.to_dict()
+        },
+        status_code=status.HTTP_201_CREATED
+    )
+
+
 @app.post("/house-login", status_code=status.HTTP_201_CREATED)
 def house_login(userId: str, password: str):
     if not is_valid_request([userId, password]):
