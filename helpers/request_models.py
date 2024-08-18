@@ -55,6 +55,16 @@ class RemoveDeviceRequest(BaseModel):
     deviceId: str
 
 
+class ResponseStatusCodes():
+    INVALID_DATA = "INVALID_DATA"
+    HOUSE_NOT_INITIALIZED = "HOUSE_NOT_INITIALIZED"
+    INVALID_CREDS = "INVALID_CREDS"
+    SERVER_ERROR = "SERVER_ERROR"
+    USER_LOGGEDIN = "USER_LOGGEDIN"
+    INVALID_REQUEST = "INVALID_REQUEST"
+    REQUEST_FULLFILLED = "REQUEST_FULLFILLED"
+
+
 def is_valid_request(request_body: list):
     for item in request_body:
         if item is None:

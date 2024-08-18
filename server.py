@@ -7,7 +7,7 @@ from controller.controller_device import ControllerDevice
 
 from database.actions import add_user, get_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data
 
-from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest
+from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest, ResponseStatusCodes
 
 from services.sys_init import SystemInitializer
 from services.schedule import ScheduleDeviceAssistant
@@ -34,6 +34,7 @@ def house_login(userId: str, password: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId and password."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -45,6 +46,7 @@ def house_login(userId: str, password: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.HOUSE_NOT_INITIALIZED,
                 "message": "House is not initialized."
             },
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE
@@ -54,6 +56,7 @@ def house_login(userId: str, password: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_CREDS,
                 "message": "Password was wrong."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -65,6 +68,7 @@ def house_login(userId: str, password: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": house_member._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -73,6 +77,7 @@ def house_login(userId: str, password: str):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.USER_LOGGEDIN,
             "message": f"Logged into the house and user with id '{userId}' added as a member.",
             "data": house_member.to_dict()
         },
@@ -86,6 +91,7 @@ def get_house_details(userId: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId, userName, houseId and roomName."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -97,6 +103,7 @@ def get_house_details(userId: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": user._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -106,6 +113,7 @@ def get_house_details(userId: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": f"User with id '{userId}' not found."
             },
             status_code=status.HTTP_404_NOT_FOUND
@@ -117,6 +125,7 @@ def get_house_details(userId: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -126,6 +135,7 @@ def get_house_details(userId: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{userId} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -137,6 +147,7 @@ def get_house_details(userId: str):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": house_data._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -145,6 +156,7 @@ def get_house_details(userId: str):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": "House data retrieved successfully.",
             "data": house_data.to_dict()
         },
@@ -159,6 +171,7 @@ def add_room(request_body: AddRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId, userName, houseId and roomName."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -170,6 +183,7 @@ def add_room(request_body: AddRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -179,6 +193,7 @@ def add_room(request_body: AddRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{request_body.userName} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -190,6 +205,7 @@ def add_room(request_body: AddRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": room._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -200,6 +216,7 @@ def add_room(request_body: AddRoomRequest):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": "Room created successfully.",
             "data": room.to_dict()
         },
@@ -214,6 +231,7 @@ def delete_room(request_body: RemoveRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId, userName, houseId and roomId."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -225,6 +243,7 @@ def delete_room(request_body: RemoveRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -234,6 +253,7 @@ def delete_room(request_body: RemoveRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{request_body.userName} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -245,6 +265,7 @@ def delete_room(request_body: RemoveRoomRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": delete_count._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -255,6 +276,7 @@ def delete_room(request_body: RemoveRoomRequest):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": f"{delete_count} Room(s) deleted successfully.",
         },
         status_code=status.HTTP_201_CREATED
@@ -268,6 +290,7 @@ def add_device(request_body: AddDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId, userName, houseId, roomId, pinNumber and deviceName."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -279,6 +302,7 @@ def add_device(request_body: AddDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -288,6 +312,7 @@ def add_device(request_body: AddDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{request_body.userName} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -300,6 +325,7 @@ def add_device(request_body: AddDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": device._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -310,6 +336,7 @@ def add_device(request_body: AddDeviceRequest):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": "Device created successfully.",
             "data": device.to_dict()
         },
@@ -324,6 +351,7 @@ def toggle_device(request_body: SwitchDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId, userName, houseId, deviceId, statusFrom and statusTo."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -335,6 +363,7 @@ def toggle_device(request_body: SwitchDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -344,6 +373,7 @@ def toggle_device(request_body: SwitchDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{request_body.userName} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -358,6 +388,7 @@ def toggle_device(request_body: SwitchDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": update_count._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -368,6 +399,7 @@ def toggle_device(request_body: SwitchDeviceRequest):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": "Device Switched successfully.",
             "data": f"{update_count} device(s) swicthed {_state}"
         },
@@ -382,6 +414,7 @@ def config_device(request_body: ConfigureDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide houseId, userId, userName, deviceId, deviceName, pinNumber, status and isScheduled."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -393,6 +426,7 @@ def config_device(request_body: ConfigureDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -402,6 +436,7 @@ def config_device(request_body: ConfigureDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{request_body.userName} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -414,6 +449,7 @@ def config_device(request_body: ConfigureDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": updated_device_count._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -450,6 +486,7 @@ def config_device(request_body: ConfigureDeviceRequest):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": "Device Configured successfully.",
             "data": f"{updated_device_count} Device(s) configured."
         },
@@ -464,6 +501,7 @@ def delete_device(request_body: RemoveDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
                 "message": "Please provide userId, userName, houseId, roomId and deviceId."
             },
             status_code=status.HTTP_400_BAD_REQUEST
@@ -475,6 +513,7 @@ def delete_device(request_body: RemoveDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -484,6 +523,7 @@ def delete_device(request_body: RemoveDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
                 "message": f"{request_body.userName} is not authorized to perform this operation."
             },
             status_code=status.HTTP_403_FORBIDDEN
@@ -495,6 +535,7 @@ def delete_device(request_body: RemoveDeviceRequest):
         return JSONResponse(
             content={
                 "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": delete_count._message()
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -505,6 +546,7 @@ def delete_device(request_body: RemoveDeviceRequest):
     return JSONResponse(
         content={
             "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
             "message": f"{delete_count} Device(s) deleted successfully.",
         },
         status_code=status.HTTP_201_CREATED
