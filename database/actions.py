@@ -88,6 +88,22 @@ def get_user(user_id: str) -> HouseMemberData | None | SQLAlchemyError:
         db.close()
 
 
+def delete_user(user_id: str) -> int | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:
+            delete_count = db.query(HouseMember).filter(
+                HouseMember.userId == user_id).delete()
+            db.flush()
+            return delete_count
+    except SQLAlchemyError as SQLError:
+        print("[DB] Deleting User Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
 def get_access(user_id: str) -> bool | SQLAlchemyError:
     db = get_db()
     try:

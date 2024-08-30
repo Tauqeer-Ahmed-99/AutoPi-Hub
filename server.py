@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from controller.controller_device import ControllerDevice
 
-from database.actions import add_user, get_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data
+from database.actions import add_user, get_user, delete_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data
 
 from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest, ResponseStatusCodes
 
@@ -70,6 +70,40 @@ def get_house_member(userId: str):
             "data": house_member.to_dict()
         },
         status_code=status.HTTP_200_OK
+    )
+
+
+@app.delete("/delete-house-member", status_code=status.HTTP_201_CREATED)
+def delete_house_member(userId: str):
+    if not is_valid_request([userId]):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
+                "message": "Please provide userId."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    delete_count = delete_user(userId)
+
+    if isinstance(delete_count, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": delete_count._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+            "message": f"{delete_count} user(s) deleted successfully.",
+        },
+        status_code=status.HTTP_201_CREATED
     )
 
 
