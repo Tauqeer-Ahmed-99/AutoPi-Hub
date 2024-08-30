@@ -103,12 +103,16 @@ class Device(Base):
         device.device_name = str(self.deviceName)
         device.pin_number = int(str(self.pinNumber))
         device.status = bool(self.status)
-        device.room_id = str(self.status)
+        device.room_id = str(self.roomId)
         device.is_scheduled = bool(self.isScheduled)
-        device.days_scheduled = str(self.daysScheduled)
-        device.start_time = str(self.startTime)
-        device.off_time = str(self.offTime)
-        device.scheduled_by = str(self.scheduledBy)
+        device.days_scheduled = str(
+            self.daysScheduled) if self.daysScheduled is not None else None
+        device.start_time = str(
+            self.startTime)if self.startTime is not None else None
+        device.off_time = str(
+            self.offTime)if self.offTime is not None else None
+        device.scheduled_by = str(
+            self.scheduledBy)if self.scheduledBy is not None else None
         device.created_at = str(self.createdAt)
         device.updated_at = str(self.updatedAt)
         return device

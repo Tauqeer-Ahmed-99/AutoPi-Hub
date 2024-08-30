@@ -9,11 +9,11 @@ class Device():
     pin_number: int
     status: bool
     room_id: str
-    is_scheduled: bool
-    days_scheduled: str
-    start_time: str
-    off_time: str
-    scheduled_by: str
+    is_scheduled: bool = False
+    days_scheduled: str | None = None
+    start_time: str | None = None
+    off_time: str | None = None
+    scheduled_by: str | None = None
     created_at: str
     updated_at: str
     output_device: OutputDevice | None = None
