@@ -6,7 +6,7 @@ class HeaderPinConfigDataModel:
     header_pin_number: int
     gpio_pin_number: int | None
     type: str
-    voltage: str
+    voltage: str | None
 
     def to_dict(self):
         return {
@@ -40,8 +40,8 @@ class HeaderPinConfig:
         header_pin_config = HeaderPinConfigDataModel()
         header_pin_config.header_pin_number = self.header_pin_number
         header_pin_config.gpio_pin_number = self.gpio_pin_number
-        header_pin_config.type = str(self.type)
-        header_pin_config.voltage = str(self.voltage)
+        header_pin_config.type = self.type.value
+        header_pin_config.voltage = self.voltage.value if self.voltage is not None else None
         return header_pin_config
 
 
