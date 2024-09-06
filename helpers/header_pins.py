@@ -13,7 +13,7 @@ class HeaderPinConfigDataModel:
             "header_pin_number": self.header_pin_number,
             "gpio_pin_number": self.gpio_pin_number,
             "type": self.type,
-            "voltage": self.voltage
+            # "voltage": self.voltage
         }
 
 
