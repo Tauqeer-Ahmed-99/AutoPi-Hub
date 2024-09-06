@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from controller.controller_device import ControllerDevice
 
-from database.actions import add_user, get_user, delete_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data
+from database.actions import add_user, get_user, delete_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data, get_available_gpio_pins
 
 from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest, ResponseStatusCodes
 
@@ -629,4 +629,61 @@ def delete_device(request_body: RemoveDeviceRequest):
             "message": f"{delete_count} Device(s) deleted successfully.",
         },
         status_code=status.HTTP_201_CREATED
+    )
+
+
+@app.get("/get-available-gpio-pins", status_code=status.HTTP_200_OK)
+def get_all_available_gpio_pins(userId: str):
+    if not is_valid_request([userId]):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
+                "message": "Please provide userId."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    house_member = get_user(userId)
+
+    if isinstance(house_member, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": house_member._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    if house_member is None:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
+                "message": f"House member with id '{userId}' not found."
+            },
+            status_code=status.HTTP_404_NOT_FOUND
+        )
+
+    available_gpio_pins = get_available_gpio_pins()
+
+    if isinstance(available_gpio_pins, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": available_gpio_pins._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return JSONResponse(
+        content={
+            "status": "success",
+            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+            "message": f"Get available GPIO pins succeed.",
+            "data": [gpio_pin_config.to_dict() for gpio_pin_config in available_gpio_pins]
+        },
+        status_code=status.HTTP_200_OK
     )

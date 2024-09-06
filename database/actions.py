@@ -8,6 +8,8 @@ from helpers.data_models import HouseMember as HouseMemberData, Room as RoomData
 
 from services.scheduled_device import get_scheduled_device_status
 
+from helpers.header_pins import HeaderPinType, HeaderPinConfig, HeaderPinConfigDataModel, pin_header_config
+
 
 def init_house_db(house_password_hash: str):
     db = get_db()
@@ -278,6 +280,28 @@ def get_scheduled_devices() -> List[DeviceData] | SQLAlchemyError:
             scheduled_devices = db.query(Device).filter(
                 Device.isScheduled == True)
             return [device.get_data() for device in scheduled_devices]
+    except SQLAlchemyError as SQLError:
+        print("[DB] Retrieve Scheduled Devices Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
+def get_available_gpio_pins() -> List[HeaderPinConfigDataModel] | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:
+            all_devices = db.query(Device).all()
+            used_gpio_pins = [int(str(device.pinNumber))
+                              for device in all_devices]
+            available_gpio_pins: List[HeaderPinConfigDataModel] = []
+
+            for pin_config in pin_header_config:
+                if pin_config.type == HeaderPinType.GPIO and pin_config.gpio_pin_number not in used_gpio_pins:
+                    available_gpio_pins.append(pin_config.get_data())
+
+            return available_gpio_pins
     except SQLAlchemyError as SQLError:
         print("[DB] Retrieve Scheduled Devices Failed.")
         print(SQLError)
