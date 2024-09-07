@@ -211,7 +211,8 @@ def configure_device(device_id: str, device_name: str, pin_number: int, status: 
         with db.begin() as txn:
             device = db.query(Device).filter(Device.deviceId == device_id)
             old_status = getattr(device.first(), "status", None)
-            new_status = get_scheduled_device_status(start_time, off_time)
+            new_status = get_scheduled_device_status(
+                start_time, off_time) if is_scheduled else status
             count = device.update(
                 {
                     Device.deviceName: device_name,
@@ -220,7 +221,7 @@ def configure_device(device_id: str, device_name: str, pin_number: int, status: 
                     Device.daysScheduled: days_scheduled if is_scheduled else "",
                     Device.startTime: start_time if is_scheduled else "",
                     Device.offTime: off_time if is_scheduled else "",
-                    Device.status: new_status if is_scheduled else status,
+                    Device.status: new_status,
                     Device.scheduledBy: user_id
                 }
             )
