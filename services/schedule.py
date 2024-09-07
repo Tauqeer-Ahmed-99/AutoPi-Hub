@@ -36,9 +36,9 @@ class ScheduleDeviceAssistant():
     def switch_scheduled_device(self):
         today = datetime.now().strftime("%a")
         for device in self.scheduled_devices:
-            if today.lower() in device.days_scheduled.lower():
+            if today.lower() in device.days_scheduled.lower() if device.days_scheduled is not None else "":
                 is_on = get_scheduled_device_status(
-                    device.start_time, device.off_time)
+                    device.start_time if device.start_time is not None else "", device.off_time if device.off_time is not None else "")
                 if is_on != device.status:
                     device.status = is_on
 

@@ -8,7 +8,7 @@ from helpers.data_models import HouseMember as HouseMemberData, Room as RoomData
 
 from services.scheduled_device import get_scheduled_device_status
 
-from helpers.header_pins import HeaderPinType, HeaderPinConfig, HeaderPinConfigDataModel, pin_header_config
+from helpers.header_pins import HeaderPinType, HeaderPinConfigDataModel, pin_header_config
 
 
 def init_house_db(house_password_hash: str):

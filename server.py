@@ -539,8 +539,13 @@ def config_device(request_body: ConfigureDeviceRequest):
     if device is not None:
         controller_device.remove_device(device.device_id)
 
-        is_on = get_scheduled_device_status(
-            request_body.startTime, request_body.offTime)
+        is_on = False
+
+        if request_body.isScheduled:
+            is_on = get_scheduled_device_status(
+                request_body.startTime, request_body.offTime)
+        else:
+            is_on = device.status
 
         device.device_name = request_body.deviceName
         device.pin_number = request_body.pinNumber
@@ -548,7 +553,7 @@ def config_device(request_body: ConfigureDeviceRequest):
         device.days_scheduled = request_body.daysScheduled if request_body.isScheduled else ""
         device.start_time = request_body.startTime if request_body.isScheduled else ""
         device.off_time = request_body.offTime if request_body.isScheduled else ""
-        device.status = is_on if request_body.isScheduled else device.status
+        device.status = is_on
         device.scheduled_by = request_body.userId
         device.output_device = None
 
