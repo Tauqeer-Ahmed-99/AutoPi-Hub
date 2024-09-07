@@ -626,6 +626,7 @@ def delete_device(request_body: RemoveDeviceRequest):
         )
 
     controller_device.remove_device(request_body.deviceId)
+    schedule_assistant.remove_scheduled_device(request_body.deviceId)
 
     return JSONResponse(
         content={
