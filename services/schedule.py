@@ -23,15 +23,15 @@ class ScheduleDeviceAssistant():
 
     scheduled_devices: List[Device] = []
 
-    _timer: threading.Timer
+    timer: threading.Timer | None = None
 
     def __init__(self, scheduled_devices: List[Device]):
         self.scheduled_devices = scheduled_devices
 
     def start_scheduled_devices_watch(self):
-        if self._timer is not None:
-            self._timer.cancel()
-        self._timer = set_interval(self.switch_scheduled_device, 60)
+        if self.timer is not None:
+            self.timer.cancel()
+        self.timer = set_interval(self.switch_scheduled_device, 60)
 
     def switch_scheduled_device(self):
         today = datetime.now().strftime("%a")
