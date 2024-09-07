@@ -245,7 +245,7 @@ def remove_device(device_id: str) -> int | SQLAlchemyError:
     try:
         with db.begin() as txn:
             count = db.query(Device).filter(
-                Device.roomId == device_id).delete()
+                Device.deviceId == device_id).delete()
             print(f"[DB] {count} Device(s) Deleted.")
             db.flush()
             return count
