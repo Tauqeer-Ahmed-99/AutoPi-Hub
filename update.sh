@@ -11,16 +11,19 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Remove the current migration version
-rm -f alembic/versions/*
+psql -h localhost -U rpi_has -d rpi_has
 
-# Generate a new base migration
-alembic revision --autogenerate -m "RPi_HAS_BASE_MIGRATIONS"
+# In psql:
+DROP TABLE IF EXISTS alembic_version;
 
-# Mark the base migration as the current version in the database
-alembic stamp head
+# Exit psql
+\q
 
-# Generate a new migration for current changes
-alembic revision --autogenerate -m "RPi_HAS_CURRENT_SCHEMA"
+# Remove old migration files
+rm -rf migrations/versions/*
+
+# Regenerate and apply new migrations
+alembic revision --autogenerate -m "RPi_HAS"
 
 # Apply the new migration
 alembic upgrade head

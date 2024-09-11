@@ -32,11 +32,17 @@ pip install "fastapi[standard]"
 # Install project dependencies
 pip install -r requirements.txt
 
-#Autogenerate Migrations
-alembic revision --autogenerate -m "RPi_HAS"
+# Remove the current migration version
+psql -h localhost -U rpi_has -d rpi_has
 
-# Run migrations
-alembic upgrade head
+# In psql:
+DROP TABLE IF EXISTS alembic_version;
+
+# Exit psql
+\q
+
+# Remove old migration files
+rm -rf migrations/versions/*
 
 # Start the Python server
 fastapi run server.py 
