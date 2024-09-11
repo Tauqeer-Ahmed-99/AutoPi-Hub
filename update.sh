@@ -10,14 +10,15 @@ source venv/bin/activate
 # Install project dependencies (new code might have new dependencies)
 pip install -r requirements.txt
 
+# Set the password for psql command
+export PGPASSWORD='rpi_has'
+
 # Remove the current migration version
-psql -h localhost -U rpi_has -d rpi_has
+sudo -u postgres psql -h localhost -U rpi_has -d rpi_has -c "DROP TABLE IF EXISTS alembic_version;"
 
-# In psql:
-DROP TABLE IF EXISTS alembic_version;
 
-# Exit psql
-\q
+# UnSet the password for psql command
+unset PGPASSWORD
 
 # Remove old migration files
 rm -rf migrations/versions/*
