@@ -397,6 +397,28 @@ def add_device(request_body: AddDeviceRequest):
             status_code=status.HTTP_403_FORBIDDEN
         )
 
+    available_gpio_pins = get_available_gpio_pins()
+
+    if isinstance(available_gpio_pins, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
+                "message": available_gpio_pins._message()
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    if request_body.pinNumber not in [gpio_pin.gpio_pin_number for gpio_pin in available_gpio_pins]:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
+                "message": f"{request_body.pinNumber} already in use by another device."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
     device = create_device(request_body.deviceName,
                            request_body.pinNumber, request_body.roomId)
 

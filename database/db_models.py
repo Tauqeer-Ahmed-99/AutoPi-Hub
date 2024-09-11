@@ -83,8 +83,9 @@ class Device(Base):
 
     deviceId = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     deviceName = Column(Text, nullable=False)
-    pinNumber = Column(Integer, nullable=False)
+    pinNumber = Column(Integer, nullable=False, unique=True)
     status = Column(Boolean, default=False, nullable=False)
+    isDefault = Column(Boolean, default=False, nullable=False)
     roomId = Column(UUID(as_uuid=True), ForeignKey(
         'Rooms.roomId', ondelete='CASCADE'), nullable=False)
     isScheduled = Column(Boolean, default=False, nullable=False)
@@ -103,6 +104,7 @@ class Device(Base):
         device.device_name = str(self.deviceName)
         device.pin_number = int(str(self.pinNumber))
         device.status = bool(self.status)
+        device.is_default = bool(self.isDefault)
         device.room_id = str(self.roomId)
         device.is_scheduled = bool(self.isScheduled)
         device.days_scheduled = str(

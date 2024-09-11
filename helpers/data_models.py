@@ -8,6 +8,7 @@ class Device():
     device_name: str
     pin_number: int
     status: bool
+    is_default: bool
     room_id: str
     is_scheduled: bool = False
     days_scheduled: str | None = None
@@ -24,6 +25,7 @@ class Device():
             "device_name": self.device_name,
             "pin_number": self.pin_number,
             "status": self.status,
+            "is_default": self.is_default,
             "room_id": self.room_id,
             "is_scheduled": self.is_scheduled,
             "days_scheduled": self.days_scheduled,
