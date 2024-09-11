@@ -74,6 +74,16 @@ class House():
             "rooms": [room.to_dict() for room in self.rooms]
         }
 
+    def to_unsafe_dict(self):
+        return {
+            "house_id": self.house_id,
+            "house_name": self.house_name,
+            "house_password_hash": self.house_password_hash,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "rooms": [room.to_dict() for room in self.rooms]
+        }
+
 
 class HouseMember():
     house_id: str

@@ -1,6 +1,22 @@
 # Find and kill the process running on port 8000
 sudo kill -9 $(lsof -t -i:8000)
 
+# Save House Data to ./data directory
+sudo python save_house_data.py
+
+# Uninstall PostgreSQL
+sudo apt-get --purge remove postgresql postgresql-*
+
+# Install PostgreSQL
+sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev
+
+# Start PostgreSQL service
+sudo service postgresql start
+
+# Set up PostgreSQL user and database
+sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
+sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
+
 # Pull the latest code from the GitHub repository
 git pull origin master
 
@@ -10,24 +26,14 @@ source venv/bin/activate
 # Install project dependencies (new code might have new dependencies)
 pip install -r requirements.txt
 
-# Set the password for psql command
-export PGPASSWORD='rpi_has'
-
-# Remove the current migration version
-sudo -u postgres psql -h localhost -U rpi_has -d rpi_has -c "DROP TABLE IF EXISTS alembic_version;"
-
-
-# UnSet the password for psql command
-unset PGPASSWORD
-
-# Remove old migration files
-rm -rf migrations/versions/*
-
 # Regenerate and apply new migrations
 alembic revision --autogenerate -m "RPi_HAS"
 
 # Apply the new migration
 alembic upgrade head
+
+# Load House Data from ./data directory
+sudo python load_house_data.py
 
 # Start the FastAPI server
 fastapi run server.py

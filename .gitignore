@@ -101,3 +101,10 @@ ENV/
 
 # Windows
 Thumbs.db
+
+/data/
+data/
+./data
+./data/*
+data/*
+/data/*

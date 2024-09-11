@@ -4,6 +4,9 @@
 # sudo apt-get update -y
 # sudo apt-get upgrade -y
 
+# Uninstall PostgreSQL in case present (it will delete all the existing postgresql databases from system)
+sudo apt-get --purge remove postgresql postgresql-*
+
 # Install PostgreSQL
 sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev lsof -y
 
@@ -31,18 +34,6 @@ pip install "fastapi[standard]"
 
 # Install project dependencies
 pip install -r requirements.txt
-
-# Set the password for psql command
-export PGPASSWORD='rpi_has'
-
-# Remove the current migration version
-sudo -u postgres psql -h localhost -U rpi_has -d rpi_has -c "DROP TABLE IF EXISTS alembic_version;"
-
-# UnSet the password for psql command
-unset PGPASSWORD
-
-# Remove old migration files
-rm -rf migrations/versions/*
 
 # Regenerate and apply new migrations
 alembic revision --autogenerate -m "RPi_HAS"

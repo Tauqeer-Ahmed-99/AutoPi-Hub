@@ -72,6 +72,21 @@ def add_user(user_id: str) -> HouseMemberData | SQLAlchemyError:
         db.close()
 
 
+def get_house_members() -> List[HouseMemberData] | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:
+            house_members = db.query(HouseMember).all()
+            db.flush()
+            return [house_member.get_data() for house_member in house_members]
+    except SQLAlchemyError as SQLError:
+        print("[DB] Retrieving House Members Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
 def get_user(user_id: str) -> HouseMemberData | None | SQLAlchemyError:
     db = get_db()
     try:
@@ -305,6 +320,21 @@ def get_available_gpio_pins() -> List[HeaderPinConfigDataModel] | SQLAlchemyErro
             return available_gpio_pins
     except SQLAlchemyError as SQLError:
         print("[DB] Retrieve Scheduled Devices Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
+def get_device_control_logs() -> List[DeviceControlLog] | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:
+            logs = db.query(DeviceControlLog).all()
+            db.flush()
+            return logs
+    except SQLAlchemyError as SQLError:
+        print("[DB] Device Creation Failed.")
         print(SQLError)
         return SQLError
     finally:
