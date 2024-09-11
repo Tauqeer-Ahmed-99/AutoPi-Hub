@@ -10,10 +10,19 @@ source venv/bin/activate
 # Install project dependencies (new code might have new dependencies)
 pip install -r requirements.txt
 
-# Autogenerate migrations (new code might contain DB changes)
-alembic revision --autogenerate -m "RPi_HAS"
+# Remove the current migration version
+rm -f alembic/versions/*
 
-# Run migrations
+# Generate a new base migration
+alembic revision --autogenerate -m "RPi_HAS_BASE_MIGRATIONS"
+
+# Mark the base migration as the current version in the database
+alembic stamp head
+
+# Generate a new migration for current changes
+alembic revision --autogenerate -m "RPi_HAS_CURRENT_SCHEMA"
+
+# Apply the new migration
 alembic upgrade head
 
 # Start the FastAPI server
