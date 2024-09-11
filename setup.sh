@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # Update system packages
-sudo apt-get update -y
-sudo apt-get upgrade -y
-
+# sudo apt-get update -y
+# sudo apt-get upgrade -y
 
 # Install PostgreSQL
-sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev -y
+sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev lsof -y
 
 # Start PostgreSQL service
 sudo service postgresql start
