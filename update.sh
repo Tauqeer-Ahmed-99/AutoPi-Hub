@@ -1,5 +1,8 @@
 # Find and kill the process running on port 8000
-sudo kill -9 $(lsof -t -i:8000)
+sudo kill -9 `sudo lsof -t -i:8000`
+
+# Use virtual environment for packages already created when setup
+source venv/bin/activate
 
 # Save House Data to ./data directory
 sudo python save_house_data.py
