@@ -1,11 +1,8 @@
 # Find and kill the process running on port 8000
 sudo kill -9 `sudo lsof -t -i:8000`
 
-# Use virtual environment for packages already created when setup
-source venv/bin/activate
-
 # Save House Data to ./data directory
-sudo python save_house_data.py
+sudo venv/bin/python save_house_data.py
 
 # Uninstall PostgreSQL
 sudo apt-get --purge remove postgresql postgresql-*
@@ -36,7 +33,7 @@ alembic revision --autogenerate -m "RPi_HAS"
 alembic upgrade head
 
 # Load House Data from ./data directory
-sudo python load_house_data.py
+sudo venv/bin/python load_house_data.py
 
 # Start the FastAPI server
 fastapi run server.py
