@@ -17,8 +17,9 @@ sudo service postgresql start
 sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
 sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
 
-# Pull the latest code from the GitHub repository
-git pull origin master
+# Pull the latest code from the GitHub repository forcefully and delete local uncommitted changes.
+git fetch origin
+git reset --hard origin/master
 
 # Use virtual environment for packages already created when setup
 source venv/bin/activate
