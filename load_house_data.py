@@ -9,11 +9,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 logs: List[DeviceControlLogData]
 
-with open('data/logs.json', 'w', encoding='utf-8') as f:
+with open('data/logs.json', 'r', encoding='utf-8') as f:
     logs = json.load(f)
 
+print("[Loaded] Device Control Logs")
 
-with open('data/house_data.json', 'w', encoding='utf-8') as f:
+
+with open('data/house_data.json', 'r', encoding='utf-8') as f:
     house_data: House = json.load(f)
     house = init_house_db(house_data.house_password_hash)
 
@@ -52,8 +54,9 @@ with open('data/house_data.json', 'w', encoding='utf-8') as f:
             finally:
                 db.close()
 
+print("[Loaded] House Data")
 
-with open('data/house_members.json', 'w', encoding='utf-8') as f:
+with open('data/house_members.json', 'r', encoding='utf-8') as f:
     house_members_data: List[HouseMemberData] = json.load(f)
 
     for house_member in house_members_data:
@@ -61,3 +64,5 @@ with open('data/house_members.json', 'w', encoding='utf-8') as f:
 
         if isinstance(user, SQLAlchemyError):
             raise Exception(user._message())
+
+print("[Loaded] House Members Data")
