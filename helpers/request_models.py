@@ -41,6 +41,7 @@ class ConfigureDeviceRequest(BaseModel):
     deviceName: str
     pinNumber: int
     status: bool
+    isDefault: bool
     isScheduled: bool
     daysScheduled: str
     startTime: str
