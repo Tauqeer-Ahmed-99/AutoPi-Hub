@@ -37,5 +37,5 @@ if isinstance(logs, SQLAlchemyError):
 
 with open('data/logs.json', 'w', encoding='utf-8') as f:
     json.dump([log.to_dict()
-              for log in logs], f, ensure_ascii=False, indent=4)
+              for log in logs] if len(logs) > 0 else [], f, ensure_ascii=False, indent=4)
     print("[Saved] Device Control Logs Data.")
