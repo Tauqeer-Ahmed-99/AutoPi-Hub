@@ -1,5 +1,5 @@
 #!/bin/bash
-
+sudo kill -9 `sudo lsof -t -i:8000`
 # Update system packages
 # sudo apt-get update -y
 # sudo apt-get upgrade -y
