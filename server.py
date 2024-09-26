@@ -511,12 +511,12 @@ def toggle_device(request_body: SwitchDeviceRequest):
 @app.put("/configure-device", status_code=status.HTTP_202_ACCEPTED)
 def config_device(request_body: ConfigureDeviceRequest):
 
-    if not is_valid_request([request_body.houseId, request_body.userId, request_body.userName, request_body.deviceId, request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isScheduled]):
+    if not is_valid_request([request_body.houseId, request_body.userId, request_body.userName, request_body.deviceId, request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isDefault, request_body.isScheduled]):
         return JSONResponse(
             content={
                 "status": "error",
                 "status_code": ResponseStatusCodes.INVALID_DATA,
-                "message": "Please provide houseId, userId, userName, deviceId, deviceName, pinNumber, status and isScheduled."
+                "message": "Please provide houseId, userId, userName, deviceId, deviceName, pinNumber, status, isDefault and isScheduled."
             },
             status_code=status.HTTP_400_BAD_REQUEST
         )
@@ -544,7 +544,7 @@ def config_device(request_body: ConfigureDeviceRequest):
         )
 
     updated_device_count = configure_device(request_body.deviceId,
-                                            request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isScheduled, request_body.daysScheduled, request_body.startTime, request_body.offTime, request_body.userId)
+                                            request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isDefault, request_body.isScheduled, request_body.daysScheduled, request_body.startTime, request_body.offTime, request_body.userId)
 
     if isinstance(updated_device_count, SQLAlchemyError):
         return JSONResponse(

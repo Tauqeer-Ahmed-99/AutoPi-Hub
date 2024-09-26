@@ -183,8 +183,10 @@ def create_device(device_name: str, pin_number: int, room_id: str) -> DeviceData
     db = get_db()
     try:
         with db.begin() as txn:
+            current_default_device = db.query(Device).filter(
+                Device.roomId == room_id, Device.isDefault == True).first()
             new_device = Device(deviceName=device_name, pinNumber=pin_number,
-                                roomId=room_id, status=False, isScheduled=False)
+                                roomId=room_id, status=False, isScheduled=False, isDefault=True if current_default_device is None else False)
             db.add(new_device)
             db.flush()
             return new_device.get_data()
@@ -219,13 +221,22 @@ def switch_device(device_id: str, from_status: bool, to_status: bool, user_id: s
         db.close()
 
 
-def configure_device(device_id: str, device_name: str, pin_number: int, status: bool, is_scheduled: bool,
+def configure_device(device_id: str, device_name: str, pin_number: int, status: bool, is_default: bool, is_scheduled: bool,
                      days_scheduled: str, start_time: str, off_time: str, user_id: str) -> int | SQLAlchemyError:
     db = get_db()
     try:
         with db.begin() as txn:
             device = db.query(Device).filter(Device.deviceId == device_id)
-            old_status = getattr(device.first(), "status", None)
+            current_device = device.first()
+
+            # If current device is set a sdefault then remove all other devices from default devices of the room
+            old_is_default = getattr(current_device, "isDefault", None)
+            is_new_default = old_is_default != None and old_is_default != is_default
+            if is_new_default and current_device is not None:
+                db.query(Device).filter(Device.roomId == current_device.roomId, Device.isDefault == True).update({
+                    Device.isDefault: False
+                })
+
             new_status = get_scheduled_device_status(
                 start_time, off_time) if is_scheduled else status
             count = device.update(
@@ -237,9 +248,12 @@ def configure_device(device_id: str, device_name: str, pin_number: int, status: 
                     Device.startTime: start_time if is_scheduled else "",
                     Device.offTime: off_time if is_scheduled else "",
                     Device.status: new_status,
+                    Device.isDefault: is_default,
                     Device.scheduledBy: user_id
                 }
             )
+
+            old_status = getattr(current_device, "status", None)
             if old_status != new_status:
                 db.add(DeviceControlLog(statusChangedFrom=old_status,
                                         statusChangedTo=new_status,
