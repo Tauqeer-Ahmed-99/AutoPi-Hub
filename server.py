@@ -10,14 +10,17 @@ from database.actions import add_user, get_user, delete_user, get_access, create
 from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest, ResponseStatusCodes
 
 from services.sys_init import SystemInitializer
+from services.socket import SocketIO
 from services.schedule import ScheduleDeviceAssistant
 from services.scheduled_device import get_scheduled_device_status
-
 
 sys = SystemInitializer()
 
 
 app = FastAPI()
+
+
+sio = SocketIO(app)
 
 
 controller_device = ControllerDevice()
