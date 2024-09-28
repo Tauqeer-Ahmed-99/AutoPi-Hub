@@ -1,5 +1,6 @@
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -18,6 +19,14 @@ sys = SystemInitializer()
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # We can restrict this to specific origins if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 sio = SocketIO(app)
