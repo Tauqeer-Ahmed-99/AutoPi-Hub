@@ -12,7 +12,7 @@ class SocketIO ():
         self.register_events()
 
     def initialize_socket_io(self, app: FastAPI):
-        self.sio = Server(cors_allowed_origins="*")
+        self.sio = Server(cors_allowed_origins="*", transports=['websocket'])
         self.app_sio = ASGIApp(self.sio, app)
 
     def register_events(self):

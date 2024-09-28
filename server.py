@@ -727,3 +727,6 @@ def get_all_available_gpio_pins(userId: str):
         },
         status_code=status.HTTP_200_OK
     )
+
+
+app = sio.app_sio

@@ -42,4 +42,5 @@ alembic revision --autogenerate -m "RPi_HAS"
 alembic upgrade head
 
 # Start the Python server
-fastapi run server.py 
+# fastapi run server.py 
+uvicorn server:app_sio --host 0.0.0.0 --port 8000 --ws websockets
