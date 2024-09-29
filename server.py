@@ -534,7 +534,8 @@ async def toggle_device(request_body: SwitchDeviceRequest):
                 "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": f"Error switching device: {e}"
             },
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            # Explicitly setting status_code to 200 to avoid Web Exceptions on Cient Side.
+            status_code=status.HTTP_200_OK
         )
 
     update_count = switch_device(request_body.deviceId,
