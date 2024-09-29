@@ -1,6 +1,8 @@
-from fastapi import FastAPI, status
+from cv2 import broadcast
+from fastapi import FastAPI, status, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -11,7 +13,7 @@ from database.actions import add_user, get_user, delete_user, get_access, create
 from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest, ResponseStatusCodes
 
 from services.sys_init import SystemInitializer
-from services.socket import SocketIO
+from services.socket import SocketEvents, SocketManager
 from services.schedule import ScheduleDeviceAssistant
 from services.scheduled_device import get_scheduled_device_status
 
@@ -29,7 +31,7 @@ app.add_middleware(
 )
 
 
-sio = SocketIO(app)
+socket_manager = SocketManager()
 
 
 controller_device = ControllerDevice()
@@ -256,7 +258,7 @@ def get_house_details(userId: str):
 
 
 @app.post("/add-room", status_code=status.HTTP_201_CREATED)
-def add_room(request_body: AddRoomRequest):
+async def add_room(request_body: AddRoomRequest):
 
     if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.roomName]):
         return JSONResponse(
@@ -304,26 +306,37 @@ def add_room(request_body: AddRoomRequest):
 
     controller_device.add_room(room)
 
+    content = {
+        "status": "success",
+        "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+        "message": "Room created successfully.",
+        "data": room.to_dict()
+    }
+
+    broadcast_data = {
+        "event": SocketEvents.ADD_ROOM,
+        "user_id": request_body.userId,
+        "message": f"{request_body.userName} created a room {request_body.roomName}.",
+        "data": content["data"]
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
+
     return JSONResponse(
-        content={
-            "status": "success",
-            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
-            "message": "Room created successfully.",
-            "data": room.to_dict()
-        },
+        content=content,
         status_code=status.HTTP_201_CREATED
     )
 
 
 @app.delete("/remove-room", status_code=status.HTTP_200_OK)
-def delete_room(request_body: RemoveRoomRequest):
+async def delete_room(request_body: RemoveRoomRequest):
 
-    if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.roomId]):
+    if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.roomId, request_body.roomName]):
         return JSONResponse(
             content={
                 "status": "error",
                 "status_code": ResponseStatusCodes.INVALID_DATA,
-                "message": "Please provide userId, userName, houseId and roomId."
+                "message": "Please provide userId, userName, houseId roomId and roomName."
             },
             status_code=status.HTTP_400_BAD_REQUEST
         )
@@ -364,6 +377,15 @@ def delete_room(request_body: RemoveRoomRequest):
 
     controller_device.remove_room(request_body.roomId)
 
+    broadcast_data = {
+        "event": SocketEvents.REMOVE_ROOM,
+        "user_id": request_body.userId,
+        "message": f"{request_body.userName} deleted a room {request_body.roomName}.",
+        "data": {"roomId": request_body.roomId}
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
+
     return JSONResponse(
         content={
             "status": "success",
@@ -375,7 +397,7 @@ def delete_room(request_body: RemoveRoomRequest):
 
 
 @app.post("/add-device", status_code=status.HTTP_201_CREATED)
-def add_device(request_body: AddDeviceRequest):
+async def add_device(request_body: AddDeviceRequest):
 
     if not is_valid_request([request_body.userId and request_body.userName and request_body.houseId and request_body.roomId and request_body.pinNumber and request_body.deviceName]):
         return JSONResponse(
@@ -446,26 +468,37 @@ def add_device(request_body: AddDeviceRequest):
 
     controller_device.add_device(device)
 
+    content = {
+        "status": "success",
+        "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+        "message": "Device created successfully.",
+        "data": device.to_dict()
+    }
+
+    broadcast_data = {
+        "event": SocketEvents.ADD_DEVICE,
+        "user_id": request_body.userId,
+        "message": f"{request_body.userName} created a device {request_body.deviceName}.",
+        "data": content["data"]
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
+
     return JSONResponse(
-        content={
-            "status": "success",
-            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
-            "message": "Device created successfully.",
-            "data": device.to_dict()
-        },
+        content=content,
         status_code=status.HTTP_201_CREATED
     )
 
 
 @app.patch("/switch-device", status_code=status.HTTP_202_ACCEPTED)
-def toggle_device(request_body: SwitchDeviceRequest):
+async def toggle_device(request_body: SwitchDeviceRequest):
 
-    if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.deviceId, request_body.statusFrom, request_body.statusTo]):
+    if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.deviceId, request_body.deviceName, request_body.statusFrom, request_body.statusTo]):
         return JSONResponse(
             content={
                 "status": "error",
                 "status_code": ResponseStatusCodes.INVALID_DATA,
-                "message": "Please provide userId, userName, houseId, deviceId, statusFrom and statusTo."
+                "message": "Please provide userId, userName, houseId, deviceId, deviceName, statusFrom and statusTo."
             },
             status_code=status.HTTP_400_BAD_REQUEST
         )
@@ -509,19 +542,30 @@ def toggle_device(request_body: SwitchDeviceRequest):
 
     _state = "on" if request_body.statusTo else "off"
 
+    content = {
+        "status": "success",
+        "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+        "message": "Device Switched successfully.",
+        "data": f"{update_count} device(s) swicthed {_state}"
+    }
+
+    broadcast_data = {
+        "event": SocketEvents.SWITCH_DEVICE,
+        "user_id": request_body.userId,
+        "message": f"{request_body.userName} turned {_state} {request_body.deviceName}.",
+        "data": {"deviceId": request_body.deviceId}
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
+
     return JSONResponse(
-        content={
-            "status": "success",
-            "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
-            "message": "Device Switched successfully.",
-            "data": f"{update_count} device(s) swicthed {_state}"
-        },
+        content=content,
         status_code=status.HTTP_201_CREATED
     )
 
 
 @app.put("/configure-device", status_code=status.HTTP_202_ACCEPTED)
-def config_device(request_body: ConfigureDeviceRequest):
+async def config_device(request_body: ConfigureDeviceRequest):
 
     if not is_valid_request([request_body.houseId, request_body.userId, request_body.userName, request_body.deviceId, request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isDefault, request_body.isScheduled]):
         return JSONResponse(
@@ -601,6 +645,15 @@ def config_device(request_body: ConfigureDeviceRequest):
                 schedule_assistant.remove_scheduled_device(
                     new_device.device_id)
 
+    broadcast_data = {
+        "event": SocketEvents.CONFIGURE_DEVICE,
+        "user_id": request_body.userId,
+        "message": f"{request_body.userName} updated the configuration of{request_body.deviceName}.",
+        "data": device.to_dict() if device is not None else None
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
+
     return JSONResponse(
         content={
             "status": "success",
@@ -613,14 +666,14 @@ def config_device(request_body: ConfigureDeviceRequest):
 
 
 @app.delete("/remove-device", status_code=status.HTTP_200_OK)
-def delete_device(request_body: RemoveDeviceRequest):
+async def delete_device(request_body: RemoveDeviceRequest):
 
-    if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.roomId, request_body.deviceId]):
+    if not is_valid_request([request_body.userId, request_body.userName, request_body.houseId, request_body.roomId, request_body.deviceId, request_body.deviceName]):
         return JSONResponse(
             content={
                 "status": "error",
                 "status_code": ResponseStatusCodes.INVALID_DATA,
-                "message": "Please provide userId, userName, houseId, roomId and deviceId."
+                "message": "Please provide userId, userName, houseId, roomId, deviceId and deviceName."
             },
             status_code=status.HTTP_400_BAD_REQUEST
         )
@@ -661,6 +714,15 @@ def delete_device(request_body: RemoveDeviceRequest):
 
     controller_device.remove_device(request_body.deviceId)
     schedule_assistant.remove_scheduled_device(request_body.deviceId)
+
+    broadcast_data = {
+        "event": SocketEvents.REMOVE_DEVICE,
+        "user_id": request_body.userId,
+        "message": f"{request_body.userName} removed device {request_body.deviceName}.",
+        "data": {"deviceId": request_body.deviceId}
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
 
     return JSONResponse(
         content={
@@ -729,4 +791,13 @@ def get_all_available_gpio_pins(userId: str):
     )
 
 
-app = sio.app_sio
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: str):
+    await socket_manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await socket_manager.is_alive(f"User {user_id} sent: {data}", websocket)
+    except WebSocketDisconnect:
+        socket_manager.disconnect(websocket)
+        await socket_manager.broadcast(f"Client #{user_id} left.")

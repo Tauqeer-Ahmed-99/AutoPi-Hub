@@ -1,25 +1,32 @@
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import List
 
-from fastapi import FastAPI
-from socketio import ASGIApp, Server
+app = FastAPI()
 
 
-class SocketIO ():
-    sio: Server
-    app_sio: ASGIApp
+class SocketManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
 
-    def __init__(self, app: FastAPI):
-        self.initialize_socket_io(app)
-        self.register_events()
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
 
-    def initialize_socket_io(self, app: FastAPI):
-        self.sio = Server(cors_allowed_origins="*", transports=['websocket'])
-        self.app_sio = ASGIApp(self.sio, app)
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
 
-    def register_events(self):
-        @self.sio.event
-        async def connect(sid, environ):
-            print('Client Connected: ', sid)
+    async def is_alive(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
 
-        @self.sio.event
-        def disconnect(sid):
-            print('Client Disconnected: ', sid)
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
+
+
+class SocketEvents():
+    ADD_ROOM = "ADD_ROOM"
+    REMOVE_ROOM = "REMOVE_ROOM"
+    ADD_DEVICE = "ADD_DEVICE"
+    SWITCH_DEVICE = "SWITCH_DEVICE"
+    CONFIGURE_DEVICE = "CONFIGURE_DEVICE"
+    REMOVE_DEVICE = "REMOVE_DEVICE"

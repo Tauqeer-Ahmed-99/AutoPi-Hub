@@ -13,6 +13,7 @@ class RemoveRoomRequest(BaseModel):
     userName: str
     houseId: str
     roomId: str
+    roomName: str
 
 
 class AddDeviceRequest(BaseModel):
@@ -29,6 +30,7 @@ class SwitchDeviceRequest(BaseModel):
     userId: str
     userName: str
     deviceId: str
+    deviceName: str
     statusFrom: bool
     statusTo: bool
 
@@ -54,6 +56,7 @@ class RemoveDeviceRequest(BaseModel):
     houseId: str
     roomId: str
     deviceId: str
+    deviceName: str
 
 
 class ResponseStatusCodes():
