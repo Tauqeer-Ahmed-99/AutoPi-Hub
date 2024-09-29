@@ -1,4 +1,3 @@
-from cv2 import broadcast
 from fastapi import FastAPI, status, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
