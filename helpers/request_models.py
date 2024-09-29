@@ -67,6 +67,7 @@ class ResponseStatusCodes():
     USER_LOGGEDIN = "USER_LOGGEDIN"
     INVALID_REQUEST = "INVALID_REQUEST"
     REQUEST_FULLFILLED = "REQUEST_FULLFILLED"
+    SWITCH_DEVICE_ERROR = "SWITCH_DEVICE_ERROR"
 
 
 def is_valid_request(request_body: list):

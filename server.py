@@ -1,3 +1,4 @@
+from exceptiongroup import catch
 from fastapi import FastAPI, status, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -524,8 +525,19 @@ async def toggle_device(request_body: SwitchDeviceRequest):
             status_code=status.HTTP_403_FORBIDDEN
         )
 
-    controller_device.switch_device(
-        request_body.deviceId, request_body.statusTo)
+    try:
+        controller_device.switch_device(
+            request_body.deviceId, request_body.statusTo)
+    except Exception as e:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": f"Error switching device: {e}"
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
     update_count = switch_device(request_body.deviceId,
                                  request_body.statusFrom, request_body.statusTo, request_body.userId)
 
@@ -552,7 +564,7 @@ async def toggle_device(request_body: SwitchDeviceRequest):
         "event": SocketEvents.SWITCH_DEVICE,
         "user_id": request_body.userId,
         "message": f"{request_body.userName} turned {_state} {request_body.deviceName}.",
-        "data": {"deviceId": request_body.deviceId}
+        "data": {"deviceId": request_body.deviceId, "state": request_body.statusTo}
     }
 
     await socket_manager.broadcast(json.dumps(broadcast_data))
@@ -585,7 +597,7 @@ async def config_device(request_body: ConfigureDeviceRequest):
                 "status_code": ResponseStatusCodes.SERVER_ERROR,
                 "message": is_authenticated._message()
             },
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status_code=status.HTTP_202_ACCEPTED
         )
 
     if not is_authenticated:
