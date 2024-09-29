@@ -38,7 +38,7 @@ class ControllerDevice:
                             device.pin_number, active_high=False)
         except Exception as e:
             print(f"Error initializing output devices: {e}")
-            raise
+            raise Exception(f"Error initializing output devices: {e}")
 
     def add_room(self, room: Room):
         if self.house is not None:
@@ -106,7 +106,7 @@ class ControllerDevice:
                     raise Exception(f"Output Device is not initialized.")
         except Exception as e:
             print(f"Error switching device: {e}")
-            raise
+            raise Exception(f"Error switching device: {e}")
 
     def remove_device(self, device_id):
         device = self.get_device(device_id)
