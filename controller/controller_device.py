@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.actions import get_house_data
 from helpers.data_models import House, Room, Device
+from services.schedule import ScheduleDeviceAssistant
 
 
 class ControllerDevice:
@@ -60,13 +61,15 @@ class ControllerDevice:
             print(f"Error getting room: {e}")
             return None
 
-    def remove_room(self, room_id: str):
+    def remove_room(self, room_id: str, schedule_assistant: ScheduleDeviceAssistant):
         if self.house is not None:
             room = self.get_room(room_id)
             if room is not None:
                 for device in room.devices:
                     if device.output_device is not None:
                         device.output_device.close()
+                        schedule_assistant.remove_scheduled_device(
+                            device.device_id)
                 self.house.rooms.remove(room)
 
     def add_device(self, device: Device):

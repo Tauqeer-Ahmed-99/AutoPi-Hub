@@ -374,7 +374,7 @@ async def delete_room(request_body: RemoveRoomRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-    controller_device.remove_room(request_body.roomId)
+    controller_device.remove_room(request_body.roomId, schedule_assistant)
 
     broadcast_data = {
         "event": SocketEvents.REMOVE_ROOM,
@@ -811,4 +811,10 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
             await socket_manager.is_alive(f"User {user_id} sent: {data}", websocket)
     except WebSocketDisconnect:
         socket_manager.disconnect(websocket)
-        await socket_manager.broadcast(f"Client #{user_id} left.")
+        broadcast_content = {
+            "event": SocketEvents.USER_LEFT,
+            "user_id": user_id,
+            "message": f"Client #{user_id} left.",
+            "data": {"userId": user_id},
+        }
+        await socket_manager.broadcast(json.dumps(broadcast_content))
