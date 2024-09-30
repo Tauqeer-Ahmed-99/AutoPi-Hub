@@ -1,6 +1,8 @@
 from typing import List
 from gpiozero import OutputDevice
 
+import RPi.GPIO as GPIO
+
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.actions import get_house_data
@@ -14,6 +16,7 @@ class ControllerDevice:
     def __init__(self):
         try:
             self.load_data()
+            self.release_all_rpi_gpio_resources()
             self.initialize_output_devices()
         except Exception as e:
             print(f"Error initializing ControllerDevice: {e}")
@@ -28,6 +31,9 @@ class ControllerDevice:
             self.house = data
         except Exception as e:
             print(f"Error in load_data: {e}")
+
+    def release_all_rpi_gpio_resources(self):
+        GPIO.cleanup()
 
     def initialize_output_devices(self):
         try:

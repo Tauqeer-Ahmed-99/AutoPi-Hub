@@ -27,6 +27,10 @@ sudo apt install python3-venv
 python3 -m venv venv
 source venv/bin/activate
 
+#Install RPi.GPIO package
+sudo apt-get install python3-rpi.gpio
+python3 -m pip install RPi.GPIO
+
 # Upgrade pip to the latest version
 pip install --upgrade pip
 

@@ -24,6 +24,10 @@ git reset --hard origin/master
 # Use virtual environment for packages already created when setup
 source venv/bin/activate
 
+#Install RPi.GPIO package
+sudo apt-get install python3-rpi.gpio
+python3 -m pip install RPi.GPIO
+
 # Install project dependencies (new code might have new dependencies)
 pip install -r requirements.txt
 
