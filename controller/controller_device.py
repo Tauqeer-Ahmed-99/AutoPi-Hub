@@ -1,7 +1,7 @@
 from typing import List
 from gpiozero import OutputDevice
 
-import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO  # type: ignore
 
 from sqlalchemy.exc import SQLAlchemyError
 
