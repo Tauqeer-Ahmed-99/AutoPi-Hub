@@ -657,7 +657,7 @@ async def config_device(request_body: ConfigureDeviceRequest):
     broadcast_data = {
         "event": SocketEvents.CONFIGURE_DEVICE,
         "user_id": request_body.userId,
-        "message": f"{request_body.userName} updated the configuration of{request_body.deviceName}.",
+        "message": f"{request_body.userName} updated the configuration of {request_body.deviceName}.",
         "data": device.to_dict() if device is not None else None
     }
 
