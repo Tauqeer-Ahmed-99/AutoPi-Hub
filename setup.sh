@@ -1,6 +1,5 @@
 #!/bin/bash
-# Kill any process on port 8000
-sudo kill -9 `sudo lsof -t -i:8000`
+
 # Update system packages
 # sudo apt-get update -y
 # sudo apt-get upgrade -y
@@ -9,18 +8,19 @@ sudo kill -9 `sudo lsof -t -i:8000`
 # Uninstall PostgreSQL in case present (it will delete all the existing postgresql databases from system)
 sudo apt-get --purge remove postgresql postgresql-*
 # Install PostgreSQL
-sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev lsof -y
+sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev 
 # Start PostgreSQL service
 sudo service postgresql start
 # Set up PostgreSQL user and database
 sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
 sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
 
-# Install Python3 and pip
-sudo apt-get install python3 python3-pip -y 
+# Install Global Packages Python3 and pip
+sudo apt-get install python3 python3-pip -y  # Install Python and Pip
+sudo apt-get install lsof -y # Install lsof to kill process on a specific port
+sudo apt install python3-venv # Install Python virtual environment
 
-# Install Python virtual environment
-sudo apt install python3-venv
+# Create and Activate Virtual Env
 python3 -m venv venv # Create a virtual environment
 source venv/bin/activate # Activate virtual environment
 
@@ -33,11 +33,12 @@ python3 -m pip install RPi.GPIO # Install RPi.GPIO package
 # Install project dependencies
 pip install -r requirements.txt
 
-# Regenerate and apply new migrations
-alembic revision --autogenerate -m "RPi_HAS"
+# Databse 
+alembic revision --autogenerate -m "RPi_HAS" # Regenerate and apply new migrations
+alembic upgrade head # Apply the new migration
 
-# Apply the new migration
-alembic upgrade head
+# Kill any process on port 8000
+sudo kill -9 `sudo lsof -t -i:8000`
 
 # Start the Python server
 fastapi run server.py 

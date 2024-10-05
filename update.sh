@@ -2,7 +2,7 @@
 sudo kill -9 `sudo lsof -t -i:8000`
 
 # Save House Data to ./data directory
-sudo venv/bin/python services/save_house_data.py
+sudo venv/bin/python save_house_data.py
 
 # PostgreSQL Setup
 # Uninstall PostgreSQL
@@ -23,21 +23,19 @@ git reset --hard origin/master
 source venv/bin/activate
 
 # Install packages which cant be installed in requirements.txt
-# Install RPi.GPIO package
-sudo apt-get install python3-rpi.gpio
-python3 -m pip install RPi.GPIO
+pip install "fastapi[standard]"
+sudo apt-get install python3-rpi.gpio # Install RPi.GPIO package
+python3 -m pip install RPi.GPIO # Install RPi.GPIO package
 
 # Install project dependencies (new code might have new dependencies)
 pip install -r requirements.txt
 
-# Regenerate and apply new migrations
-alembic revision --autogenerate -m "RPi_HAS"
-
-# Apply the new migration
-alembic upgrade head
+# Databse 
+alembic revision --autogenerate -m "RPi_HAS" # Regenerate and apply new migrations
+alembic upgrade head # Apply the new migration
 
 # Load House Data from ./data directory
-sudo venv/bin/python services/load_house_data.py
+sudo venv/bin/python load_house_data.py
 
 # Start the FastAPI server
 fastapi run server.py

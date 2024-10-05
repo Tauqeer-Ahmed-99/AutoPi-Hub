@@ -1,8 +1,8 @@
 import os
 import json
 
-from database.actions import get_device_control_logs, get_house_data, get_house_members
 from sqlalchemy.exc import SQLAlchemyError
+from database.actions import get_device_control_logs, get_house_data, get_house_members
 
 
 # Ensure the directory exists
