@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from database.database import get_db
 from database.db_models import Houses, HouseMember, Room, Device, DeviceControlLog
-from helpers.data_models import HouseMember as HouseMemberData, Room as RoomData, Device as DeviceData, House as HouseData
+from helpers.data_models import HouseMember as HouseMemberData, Room as RoomData, Device as DeviceData, House as HouseData, DeviceControlLog as DeviceControlLogData
 
 from services.scheduled_device import get_scheduled_device_status
 
@@ -340,13 +340,15 @@ def get_available_gpio_pins() -> List[HeaderPinConfigDataModel] | SQLAlchemyErro
         db.close()
 
 
-def get_device_control_logs() -> List[DeviceControlLog] | SQLAlchemyError:
+def get_device_control_logs() -> List[DeviceControlLogData] | SQLAlchemyError:
     db = get_db()
     try:
         with db.begin() as txn:
             logs = db.query(DeviceControlLog).all()
+            logs_data = [log.get_data()
+                         for log in logs] if len(logs) > 0 else []
             db.flush()
-            return logs
+            return logs_data
     except SQLAlchemyError as SQLError:
         print("[DB] Device Creation Failed.")
         print(SQLError)
