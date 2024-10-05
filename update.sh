@@ -1,5 +1,4 @@
-# Find and kill the process running on port 8000
-sudo kill -9 `sudo lsof -t -i:8000`
+#!/bin/bash
 
 # Save House Data to ./data directory
 sudo venv/bin/python save_house_data.py
@@ -36,6 +35,9 @@ alembic upgrade head # Apply the new migration
 
 # Load House Data from ./data directory
 sudo venv/bin/python load_house_data.py
+
+# Find and kill the process running on port 8000
+sudo kill -9 `sudo lsof -t -i:8000`
 
 # Start the FastAPI server
 fastapi run server.py
