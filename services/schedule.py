@@ -1,9 +1,9 @@
 import json
 import threading
 from datetime import datetime
-from typing import List
+from typing import Any, List
 
-from controller.controller_device import ControllerDevice
+# from controller.controller_device import ControllerDevice
 from database.actions import switch_device
 
 from helpers.data_models import Device
@@ -25,12 +25,12 @@ def set_interval(func, sec):
 class ScheduleDeviceAssistant():
 
     scheduled_devices: List[Device] = []
-    controller_device: ControllerDevice
+    controller_device: Any
     socket_manager: SocketManager
 
     timer: threading.Timer | None = None
 
-    def __init__(self, controller_device: ControllerDevice, socket_manager: SocketManager):
+    def __init__(self, controller_device: Any, socket_manager: SocketManager):
         scheduled_devices = controller_device.get_scheduled_devices()
         scheduled_devices = scheduled_devices if scheduled_devices is not None else []
         self.scheduled_devices = scheduled_devices
