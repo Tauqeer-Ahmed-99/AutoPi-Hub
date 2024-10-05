@@ -2,17 +2,15 @@
 sudo kill -9 `sudo lsof -t -i:8000`
 
 # Save House Data to ./data directory
-sudo venv/bin/python save_house_data.py
+sudo venv/bin/python services/save_house_data.py
 
+# PostgreSQL Setup
 # Uninstall PostgreSQL
 sudo apt-get --purge remove postgresql postgresql-*
-
 # Install PostgreSQL
 sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev
-
 # Start PostgreSQL service
 sudo service postgresql start
-
 # Set up PostgreSQL user and database
 sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
 sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
@@ -24,7 +22,8 @@ git reset --hard origin/master
 # Use virtual environment for packages already created when setup
 source venv/bin/activate
 
-#Install RPi.GPIO package
+# Install packages which cant be installed in requirements.txt
+# Install RPi.GPIO package
 sudo apt-get install python3-rpi.gpio
 python3 -m pip install RPi.GPIO
 
@@ -38,7 +37,7 @@ alembic revision --autogenerate -m "RPi_HAS"
 alembic upgrade head
 
 # Load House Data from ./data directory
-sudo venv/bin/python load_house_data.py
+sudo venv/bin/python services/load_house_data.py
 
 # Start the FastAPI server
 fastapi run server.py

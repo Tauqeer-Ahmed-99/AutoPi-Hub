@@ -1,18 +1,15 @@
 import json
-from typing import Any, List
+from typing import Any
 
-from database.actions import add_user, create_device, create_room, init_house_db
+from database.actions import add_user,  create_room, init_house_db
 from database.database import get_db
 from database.db_models import Device, DeviceControlLog, HouseMember
-from helpers.data_models import House, HouseMember as HouseMemberData, DeviceControlLog as DeviceControlLogData
 from sqlalchemy.exc import SQLAlchemyError
 
 logs: Any
 
 with open('data/logs.json', 'r', encoding='utf-8') as f:
     logs = json.load(f)
-
-print("[Loaded] Device Control Logs")
 
 
 with open('data/house_data.json', 'r', encoding='utf-8') as f:
@@ -42,13 +39,20 @@ with open('data/house_data.json', 'r', encoding='utf-8') as f:
                     db.flush()
                     for log in logs:
                         if log.device_id == device.device_id:
-                            new_log = DeviceControlLog(statusChangedFrom=log["status_changed_from"],
-                                                       statusChangedTo=log["status_changed_to"],
-                                                       deviceId=new_device.get_data().device_id,
-                                                       userId=log["user_id"])
-
-                            if isinstance(new_log, SQLAlchemyError):
-                                raise Exception(new_log._message())
+                            db = get_db()
+                            try:
+                                with db.begin() as txn:
+                                    new_log = DeviceControlLog(statusChangedFrom=log["status_changed_from"],
+                                                               statusChangedTo=log["status_changed_to"],
+                                                               deviceId=new_device.get_data().device_id,
+                                                               userId=log["user_id"])
+                                    db.add(new_log)
+                                    db.flush
+                            except SQLAlchemyError as SQLError:
+                                print("[DB] Device Creation Failed.")
+                                print(SQLError)
+                            finally:
+                                db.close()
             except SQLAlchemyError as SQLError:
                 print("[DB] Device Creation Failed.")
                 print(SQLError)
@@ -56,6 +60,7 @@ with open('data/house_data.json', 'r', encoding='utf-8') as f:
                 db.close()
 
 print("[Loaded] House Data")
+print("[Loaded] Device Control Logs")
 
 with open('data/house_members.json', 'r', encoding='utf-8') as f:
     house_members_data: Any = json.load(f)
