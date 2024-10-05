@@ -1,7 +1,5 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import WebSocket
 from typing import List
-
-app = FastAPI()
 
 
 class SocketManager:
@@ -28,6 +26,7 @@ class SocketEvents():
     REMOVE_ROOM = "REMOVE_ROOM"
     ADD_DEVICE = "ADD_DEVICE"
     SWITCH_DEVICE = "SWITCH_DEVICE"
+    SCHEDULED_SWITCH_DEVICE = "SCHEDULED_SWITCH_DEVICE"
     CONFIGURE_DEVICE = "CONFIGURE_DEVICE"
     REMOVE_DEVICE = "REMOVE_DEVICE"
     USER_LEFT = "USER_LEFT"

@@ -36,9 +36,7 @@ socket_manager = SocketManager()
 controller_device = ControllerDevice()
 
 
-scheduled_devices = controller_device.get_scheduled_devices()
-scheduled_devices = scheduled_devices if scheduled_devices is not None else []
-schedule_assistant = ScheduleDeviceAssistant(scheduled_devices)
+schedule_assistant = ScheduleDeviceAssistant(controller_device, socket_manager)
 
 
 @app.get("/get-house-member", status_code=status.HTTP_200_OK)
