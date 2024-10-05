@@ -33,9 +33,41 @@ python3 -m pip install RPi.GPIO # Install RPi.GPIO package
 # Install project dependencies
 pip install -r requirements.txt
 
-# Databse 
+# Database 
 alembic revision --autogenerate -m "RPi_HAS" # Regenerate and apply new migrations
 alembic upgrade head # Apply the new migration
+
+# Reister HomeAutomationSystem Service to start automatically on boot
+
+# Define the service file path
+SERVICE_FILE="/etc/systemd/system/hasfastapi.service"
+# Get the current username
+USER_NAME=$(whoami)
+# Create the hasfastapi.service file
+sudo bash -c "cat > $SERVICE_FILE" << EOL
+[Unit]
+Description=Home Automation System's FastAPI Application
+After=network.target
+
+[Service]
+User=$USER_NAME
+WorkingDirectory=/home/$USER_NAME/RPi_HAS
+ExecStart=/home/$USER_NAME/RPi_HAS/venv/bin/python fastapi run server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
+# Reload the systemd manager configuration
+sudo systemctl daemon-reload
+# Enable the FastAPI service to start on boot
+sudo systemctl enable hasfastapi
+# Start the FastAPI service
+# sudo systemctl start hasfastapi
+# Check the status of the FastAPI service
+sudo systemctl status hasfastapi
 
 # Kill any process on port 8000
 sudo kill -9 `sudo lsof -t -i:8000`
