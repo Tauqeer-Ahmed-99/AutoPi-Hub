@@ -40,10 +40,10 @@ alembic upgrade head # Apply the new migration
 # Reister HomeAutomationSystem Service to start automatically on boot
 
 # Define the service file path
-SERVICE_FILE="/etc/systemd/system/hasfastapi.service"
+SERVICE_FILE="/etc/systemd/system/autopihas.service"
 # Get the current username
 USER_NAME=$(whoami)
-# Create the hasfastapi.service file
+# Create the autopihas.service file
 sudo bash -c "cat > $SERVICE_FILE" << EOL
 [Unit]
 Description=Home Automation System's FastAPI Application
@@ -63,11 +63,11 @@ EOL
 # Reload the systemd manager configuration
 sudo systemctl daemon-reload
 # Enable the FastAPI service to start on boot
-sudo systemctl enable hasfastapi
+sudo systemctl enable autopihas
 # Start the FastAPI service
-# sudo systemctl start hasfastapi
+# sudo systemctl start autopihas
 # Check the status of the FastAPI service
-sudo systemctl status hasfastapi
+sudo systemctl status autopihas
 
 # Kill any process on port 8000
 sudo kill -9 `sudo lsof -t -i:8000`
