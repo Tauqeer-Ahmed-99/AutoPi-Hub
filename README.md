@@ -11,11 +11,12 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 
 ### Part 1: Setting up the Local Server on Raspberry Pi
 
-1. **Purchase a Raspberry Pi (or similar device)** that can run a Python server and has GPIO pins to connect physical devices.
-2. **Install the OS** on the Raspberry Pi:
+1. **Raspberry Pi (or similar device)** that can run a Python server and has GPIO pins to connect physical devices.
+2. **Install the Official Debian OS** on the Raspberry Pi:
 
    - Follow the official Raspberry Pi guidelines to install the Debian OS provided by the Raspberry Pi Foundation.
    - During installation, **set the hostname to `rpi`** for ease of access.
+   - Any Linux Operating System with other devices are supported.
 
 3. **Login to Raspberry Pi**:
 
@@ -32,10 +33,10 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
    - After logging in, copy and paste the following command into your terminal to install the AutoPi Hub Home Automation System software and its dependencies:
 
      ```bash
-     sudo apt-get install git -y && \
-     sudo rm -rf ./RPi_HAS && \
-     git clone https://github.com/Tauqeer-Ahmed-99/RPi_HAS.git && \
-     cd ./RPi_HAS && \
+     sudo apt-get install git -y &&
+     sudo rm -rf ./RPi_HAS &&
+     git clone https://github.com/Tauqeer-Ahmed-99/RPi_HAS.git &&
+     cd ./RPi_HAS &&
      chmod +x setup.sh && ./setup.sh
      ```
 
@@ -77,7 +78,7 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 
 1. **Create Rooms**:
 
-   - On the app dashboard, create different rooms (e.g., Living Room, Bedroom) where devices will be installed.
+   - On the app dashboard, create different rooms (e.g. Living Room, Bedroom) where devices will be installed.
 
 2. **Add Devices**:
 
