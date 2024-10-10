@@ -34,15 +34,15 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 
      ```bash
      sudo apt-get install git -y &&
-     sudo rm -rf ./RPi_HAS &&
-     git clone https://github.com/Tauqeer-Ahmed-99/RPi_HAS.git &&
-     cd ./RPi_HAS &&
+     sudo rm -rf ./AutoPi-Hub &&
+     git clone https://github.com/Tauqeer-Ahmed-99/AutoPi-Hub.git &&
+     cd ./AutoPi-Hub &&
      chmod +x setup.sh && ./setup.sh
      ```
 
    - This command will:
      1. Install Git (if not already installed).
-     2. Remove any existing `RPi_HAS` directory.
+     2. Remove any existing `AutoPi-Hub` directory.
      3. Clone the repository containing the AutoPi Hub Home Automation System.
      4. Run the setup script to install necessary dependencies and software.
 
