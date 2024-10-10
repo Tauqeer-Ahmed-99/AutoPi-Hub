@@ -5,7 +5,7 @@
 The AutoPi Hub Home Automation System provides a simple, secure, and flexible way to automate home devices using Raspberry Pi (or similar device(s)) and a mobile app (Control Nest). It consists of two main parts:
 
 1. **AutoPi Hub:** Local Server on Home Network (using Raspberry Pi or similar device)
-2. **Control Nest:** Mobile App for control and monitoring. [Download APK](https://github.com/Tauqeer-Ahmed-99/Control-Nest) [Source Code](https://github.com/Tauqeer-Ahmed-99/Control-Nest)
+2. **Control Nest:** Mobile App for control and monitoring. [Download APK](https://github.com/Tauqeer-Ahmed-99/Control-Nest/releases/download/v1.0.0/Control-Nest-v1.0.0.apk) [Source Code](https://github.com/Tauqeer-Ahmed-99/Control-Nest)
 
 ## Get Started
 
@@ -59,7 +59,7 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 1. **Download the Control Nest Mobile App**:
 
    - Download the Control Nest mobile app from the following link:
-     [ControlNest.apk](https://github.com/Tauqeer-Ahmed-99/Control-Nest)
+     [ControlNest.apk](https://github.com/Tauqeer-Ahmed-99/Control-Nest/releases/download/v1.0.0/Control-Nest-v1.0.0.apk)
 
 2. **Login/Signup**:
 
@@ -121,7 +121,7 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 
 ## Want to Contribute?
 
-- We welcome contributions! If you're interested in improving Control Nest, follow these steps:
+- We welcome contributions! If you're interested in improving AutoPi Hub, follow these steps:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/feature-name or bug/bug-name`).
