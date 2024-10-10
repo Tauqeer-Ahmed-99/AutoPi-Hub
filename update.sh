@@ -11,8 +11,8 @@ sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev
 # Start PostgreSQL service
 sudo service postgresql start
 # Set up PostgreSQL user and database
-sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
-sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
+sudo -u postgres psql -c "CREATE USER autopi_hub WITH PASSWORD 'autopi_hub';"
+sudo -u postgres psql -c "CREATE DATABASE autopi_hub OWNER autopi_hub;"
 
 # Pull the latest code from the GitHub repository forcefully and delete local uncommitted changes.
 git fetch origin
@@ -30,7 +30,7 @@ python3 -m pip install RPi.GPIO # Install RPi.GPIO package
 pip install -r requirements.txt
 
 # Databse 
-alembic revision --autogenerate -m "RPi_HAS" # Regenerate and apply new migrations
+alembic revision --autogenerate -m "AutoPi-Hub" # Regenerate and apply new migrations
 alembic upgrade head # Apply the new migration
 
 # Load House Data from ./data directory
