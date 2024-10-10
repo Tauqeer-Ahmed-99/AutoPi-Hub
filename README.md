@@ -4,12 +4,12 @@
 
 The AutoPi Hub Home Automation System provides a simple, secure, and flexible way to automate home devices using Raspberry Pi (or similar device(s)) and a mobile app (Control Nest). It consists of two main parts:
 
-1. **AutoPi Hub: Local Server on Home Network** (using Raspberry Pi or similar device)
-2. **Control Nest: Mobile App** for control and monitoring
+1. **AutoPi Hub:** Local Server on Home Network (using Raspberry Pi or similar device)
+2. **Control Nest:** Mobile App for control and monitoring. [Download APK](https://github.com/Tauqeer-Ahmed-99/Control-Nest) [Source Code](https://github.com/Tauqeer-Ahmed-99/Control-Nest)
 
 ## Get Started
 
-### Part 1: Setting up the Local Server on Raspberry Pi
+### Part 1: Setting up the AutoPi Hub Local Server on Raspberry Pi
 
 1. **Raspberry Pi (or similar device)** that can run a Python server and has GPIO pins to connect physical devices.
 2. **Install the Official Debian OS** on the Raspberry Pi:
@@ -59,7 +59,7 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 1. **Download the Control Nest Mobile App**:
 
    - Download the Control Nest mobile app from the following link:
-     [ControlNest.apk](https://example.com/download-mobile-app)
+     [ControlNest.apk](https://github.com/Tauqeer-Ahmed-99/Control-Nest)
 
 2. **Login/Signup**:
 
@@ -118,3 +118,19 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
    - **Step 4**: Add/Create rooms and devices in the mobile app.
    - **Step 5**: Wire the devices according to simple schematic diagrams.
    - **Done**: The home is now automated.
+
+## Want to Contribute?
+
+- We welcome contributions! If you're interested in improving Control Nest, follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/feature-name or bug/bug-name`).
+3. Make your changes and commit them (`git commit -m 'added: feature name' or 'resolved: bug name'`).
+4. Push to the branch (`git push origin feature/feature-name or bug/bug-name`).
+5. Open a pull request.
+
+- Please check the issues section for existing bugs or features you'd like to work on.
+
+## License
+
+- This project is licensed under the MIT License. See the LICENSE file for more details.
