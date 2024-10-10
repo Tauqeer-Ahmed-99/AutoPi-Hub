@@ -12,8 +12,8 @@ sudo apt-get install postgresql postgresql-contrib libpq-dev python3-dev
 # Start PostgreSQL service
 sudo service postgresql start
 # Set up PostgreSQL user and database
-sudo -u postgres psql -c "CREATE USER rpi_has WITH PASSWORD 'rpi_has';"
-sudo -u postgres psql -c "CREATE DATABASE rpi_has OWNER rpi_has;"
+sudo -u postgres psql -c "CREATE USER autopi_hub WITH PASSWORD 'autopi_hub';"
+sudo -u postgres psql -c "CREATE DATABASE autopi_hub OWNER autopi_hub;"
 
 # Install Global Packages Python3 and pip
 sudo apt-get install python3 python3-pip -y  # Install Python and Pip
@@ -34,25 +34,25 @@ python3 -m pip install RPi.GPIO # Install RPi.GPIO package
 pip install -r requirements.txt
 
 # Database 
-alembic revision --autogenerate -m "RPi_HAS" # Regenerate and apply new migrations
+alembic revision --autogenerate -m "AutoPi-Hub" # Regenerate and apply new migrations
 alembic upgrade head # Apply the new migration
 
 # Reister HomeAutomationSystem Service to start automatically on boot
 
 # Define the service file path
-SERVICE_FILE="/etc/systemd/system/autopihas.service"
+SERVICE_FILE="/etc/systemd/system/autopihub.service"
 # Get the current username
 USER_NAME=$(whoami)
-# Create the autopihas.service file
+# Create the autopihub.service file
 sudo bash -c "cat > $SERVICE_FILE" << EOL
 [Unit]
-Description=Home Automation System's FastAPI Application
+Description=AutoPi Hubs's Home Automation System with FastAPI Application
 After=network.target
 
 [Service]
 User=$USER_NAME
-WorkingDirectory=/home/$USER_NAME/RPi_HAS
-ExecStart=/home/$USER_NAME/RPi_HAS/venv/bin/python fastapi run server.py
+WorkingDirectory=/home/$USER_NAME/AutoPi-Hub
+ExecStart=/home/$USER_NAME/AutoPi-Hub/venv/bin/python fastapi run server.py
 Restart=always
 RestartSec=3
 
@@ -63,11 +63,11 @@ EOL
 # Reload the systemd manager configuration
 sudo systemctl daemon-reload
 # Enable the FastAPI service to start on boot
-sudo systemctl enable autopihas
+sudo systemctl enable autopihub
 # Start the FastAPI service
-# sudo systemctl start autopihas
+# sudo systemctl start autopihub
 # Check the status of the FastAPI service
-sudo systemctl status autopihas
+sudo systemctl status autopihub
 
 # Kill any process on port 8000
 sudo kill -9 `sudo lsof -t -i:8000`
