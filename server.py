@@ -863,8 +863,8 @@ async def get_energy_consumption(userId: str):
         "message": f"Energy Consumption calculated successfully.",
         "data": {
             "energy_consumption_watt_hours": energy_consumption_watt_hours,
-            "start_date": last_month_start,
-            "end_date": current_month_start
+            "start_date": last_month_start.isoformat(),
+            "end_date": current_month_start.isoformat()
         }
     }
 
