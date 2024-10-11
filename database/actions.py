@@ -357,7 +357,7 @@ def get_device_control_logs() -> List[DeviceControlLogData] | SQLAlchemyError:
             db.flush()
             return logs_data
     except SQLAlchemyError as SQLError:
-        print("[DB] Device Creation Failed.")
+        print("[DB] Fetch Device Control Logs Failed.")
         print(SQLError)
         return SQLError
     finally:
@@ -379,7 +379,7 @@ def get_specific_device_control_logs(start_date: datetime, end_date: datetime, d
             db.flush()
             return logs_data
     except SQLAlchemyError as SQLError:
-        print("[DB] Device Creation Failed.")
+        print("[DB] Fetch Specific Device Control Logs Failed.")
         print(SQLError)
         return SQLError
     finally:
