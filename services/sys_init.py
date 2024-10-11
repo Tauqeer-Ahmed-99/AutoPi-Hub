@@ -72,15 +72,16 @@ class PrintHeading():
         self.print_centered(text, width)
         print('+' + '-' * (width - 2) + '+')
 
-    def print_italic(self, text):
+    def print_italic(self, text, width):
         """Simulate italic text by using underscores for slant."""
         for line in text.splitlines():
-            print(f"\033[3m{line}\033[0m")  # ANSI escape code for italic text
+            # ANSI escape code for italic text
+            self.print_centered(f"\033[3m{line}\033[0m", width)
 
     def print_heading(self, width: int, init_heading: str, heading: str, sub_heading: str):
         # Frame with "Welcome" centered
         self.print_frame(init_heading, width)
         # Main heading in italic
-        self.print_italic(heading)
+        self.print_italic(heading, width)
         # Frame with "Create New House" centered
         self.print_frame(sub_heading, width)
