@@ -15,6 +15,7 @@ class Device():
     start_time: str | None = None
     off_time: str | None = None
     scheduled_by: str | None = None
+    wattage: float | None = None
     created_at: str
     updated_at: str
     output_device: OutputDevice | None = None
@@ -32,6 +33,7 @@ class Device():
             "start_time": self.start_time,
             "off_time": self.off_time,
             "scheduled_by": self.scheduled_by,
+            "wattage": self.wattage,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             # "output_device": self.output_device.__dict__ if self.output_device else None
@@ -102,6 +104,7 @@ class DeviceControlLog():
     user_id: str
     status_changed_from: bool
     status_changed_to: bool
+    device_wattage: float
     created_at: str
     updated_at: str
 
@@ -112,6 +115,7 @@ class DeviceControlLog():
             "user_id": self.user_id,
             "status_changed_from": self.status_changed_from,
             "status_changed_to": self.status_changed_to,
+            "device_wattage": self.device_wattage,
             "created_at": self.created_at,
             "updated_at": self.updated_at
         }

@@ -2,15 +2,17 @@ from fastapi import FastAPI, status, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import json
+from datetime import datetime, timedelta
 
 from sqlalchemy.exc import SQLAlchemyError
 
 from controller.controller_device import ControllerDevice
 
-from database.actions import add_user, get_user, delete_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data, get_available_gpio_pins
+from database.actions import add_user, get_specific_device_control_logs, get_user, delete_user, get_access, create_room, remove_room, create_device, switch_device, configure_device, remove_device, get_house_data, get_available_gpio_pins
 
 from helpers.request_models import is_valid_request, AddRoomRequest, RemoveRoomRequest, AddDeviceRequest, SwitchDeviceRequest, ConfigureDeviceRequest, RemoveDeviceRequest, ResponseStatusCodes
 
+from services.energy_consumption import calculate_energy_consumption
 from services.sys_init import SystemInitializer
 from services.socket import SocketEvents, SocketManager
 from services.schedule import ScheduleDeviceAssistant
@@ -451,7 +453,7 @@ async def add_device(request_body: AddDeviceRequest):
         )
 
     device = create_device(request_body.deviceName,
-                           request_body.pinNumber, request_body.roomId)
+                           request_body.pinNumber, request_body.wattage, request_body.roomId)
 
     if isinstance(device, SQLAlchemyError):
         return JSONResponse(
@@ -609,7 +611,7 @@ async def config_device(request_body: ConfigureDeviceRequest):
         )
 
     updated_device_count = configure_device(request_body.deviceId,
-                                            request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isDefault, request_body.isScheduled, request_body.daysScheduled, request_body.startTime, request_body.offTime, request_body.userId)
+                                            request_body.deviceName, request_body.pinNumber, request_body.status, request_body.isDefault, request_body.isScheduled, request_body.daysScheduled, request_body.startTime, request_body.offTime, request_body.wattage, request_body.userId)
 
     if isinstance(updated_device_count, SQLAlchemyError):
         return JSONResponse(
@@ -796,6 +798,87 @@ def get_all_available_gpio_pins(userId: str):
             "message": f"Get available GPIO pins succeed.",
             "data": [gpio_pin_config.to_dict() for gpio_pin_config in available_gpio_pins]
         },
+        status_code=status.HTTP_200_OK
+    )
+
+
+@app.get("/get-energy-consumption", status_code=status.HTTP_200_OK)
+async def get_energy_consumption(userId: str):
+    if not is_valid_request([userId]):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_DATA,
+                "message": "Please provide userId."
+            },
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+    is_authenticated = get_access(userId)
+
+    if isinstance(is_authenticated, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": is_authenticated._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    if not is_authenticated:
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.INVALID_REQUEST,
+                "message": f"{userId} is not authorized to perform this operation."
+            },
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+    today = datetime.now()
+    current_month_start = today.replace(day=15)
+    last_month_start = (current_month_start -
+                        timedelta(days=30)).replace(day=15)
+
+    logs = get_specific_device_control_logs(
+        last_month_start, current_month_start)
+
+    if isinstance(logs, SQLAlchemyError):
+        return JSONResponse(
+            content={
+                "status": "error",
+                "status_code": ResponseStatusCodes.SERVER_ERROR,
+                "message": logs._message()
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    energy_consumption_watt_hours = calculate_energy_consumption(
+        logs, current_month_start)
+
+    content = {
+        "status": "success",
+        "status_code": ResponseStatusCodes.REQUEST_FULLFILLED,
+        "message": f"Energy Consumption calculated successfully.",
+        "data": {
+            "energy_consumption_watt_hours": energy_consumption_watt_hours,
+            "start_date": last_month_start,
+            "end_date": current_month_start
+        }
+    }
+
+    broadcast_data = {
+        "event": SocketEvents.ENERGY_CONSUMPTION_CALCULATED,
+        "user_id": userId,
+        "message": f"Energy Consumption calculated successfully.",
+        "data": content
+    }
+
+    await socket_manager.broadcast(json.dumps(broadcast_data))
+
+    return JSONResponse(
+        content=content,
         status_code=status.HTTP_200_OK
     )
 

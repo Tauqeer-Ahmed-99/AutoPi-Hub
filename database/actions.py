@@ -1,5 +1,7 @@
 
+from datetime import datetime
 from typing import List
+from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
 
 from database.database import get_db
@@ -179,13 +181,13 @@ def remove_room(room_id: str) -> int | SQLAlchemyError:
         db.close()
 
 
-def create_device(device_name: str, pin_number: int, room_id: str) -> DeviceData | SQLAlchemyError:
+def create_device(device_name: str, pin_number: int, wattage: float, room_id: str) -> DeviceData | SQLAlchemyError:
     db = get_db()
     try:
         with db.begin() as txn:
             current_default_device = db.query(Device).filter(
                 Device.roomId == room_id, Device.isDefault == True).first()
-            new_device = Device(deviceName=device_name, pinNumber=pin_number,
+            new_device = Device(deviceName=device_name, pinNumber=pin_number, wattage=wattage,
                                 roomId=room_id, status=False, isScheduled=False, isDefault=True if current_default_device is None else False)
             db.add(new_device)
             db.flush()
@@ -202,14 +204,18 @@ def switch_device(device_id: str, from_status: bool, to_status: bool, user_id: s
     db = get_db()
     try:
         with db.begin() as txn:
-            count = db.query(Device).filter(Device.deviceId == device_id).update(
+            device = db.query(Device).filter(Device.deviceId == device_id)
+            count = device.update(
                 {
                     Device.status: to_status
                 }
             )
+            _device = device.first()
+            device_wattage = _device.wattage if _device is not None else None
             db.add(DeviceControlLog(statusChangedFrom=from_status,
                                     statusChangedTo=to_status,
                                     deviceId=device_id,
+                                    deviceWattage=device_wattage,
                                     userId=user_id))
             db.flush()
             return count
@@ -221,14 +227,13 @@ def switch_device(device_id: str, from_status: bool, to_status: bool, user_id: s
         db.close()
 
 
-def configure_device(device_id: str, device_name: str, pin_number: int, status: bool, is_default: bool, is_scheduled: bool,
-                     days_scheduled: str, start_time: str, off_time: str, user_id: str) -> int | SQLAlchemyError:
+def configure_device(device_id: str, device_name: str, pin_number: int, status: bool, is_default: bool, is_scheduled: bool, days_scheduled: str, start_time: str, off_time: str, wattage: float, user_id: str) -> int | SQLAlchemyError:
     db = get_db()
     try:
         with db.begin() as txn:
             device = db.query(Device).filter(Device.deviceId == device_id)
             current_device = device.first()
-
+            current_device_wattage = current_device.wattage if current_device is not None else None
             # If current device is set a sdefault then remove all other devices from default devices of the room
             old_is_default = getattr(current_device, "isDefault", None)
             is_new_default = old_is_default != None and old_is_default != is_default
@@ -249,7 +254,8 @@ def configure_device(device_id: str, device_name: str, pin_number: int, status: 
                     Device.offTime: off_time if is_scheduled else "",
                     Device.status: new_status,
                     Device.isDefault: is_default,
-                    Device.scheduledBy: user_id
+                    Device.scheduledBy: user_id,
+                    Device.wattage: wattage
                 }
             )
 
@@ -258,6 +264,7 @@ def configure_device(device_id: str, device_name: str, pin_number: int, status: 
                 db.add(DeviceControlLog(statusChangedFrom=old_status,
                                         statusChangedTo=new_status,
                                         deviceId=device_id,
+                                        deviceWattage=current_device_wattage,
                                         userId=user_id))
             db.flush()
             return count
@@ -345,6 +352,28 @@ def get_device_control_logs() -> List[DeviceControlLogData] | SQLAlchemyError:
     try:
         with db.begin() as txn:
             logs = db.query(DeviceControlLog).all()
+            logs_data = [log.get_data()
+                         for log in logs] if len(logs) > 0 else []
+            db.flush()
+            return logs_data
+    except SQLAlchemyError as SQLError:
+        print("[DB] Device Creation Failed.")
+        print(SQLError)
+        return SQLError
+    finally:
+        db.close()
+
+
+def get_specific_device_control_logs(start_date: datetime, end_date: datetime, device_id="all") -> List[DeviceControlLogData] | SQLAlchemyError:
+    db = get_db()
+    try:
+        with db.begin() as txn:
+            query = db.query(DeviceControlLog).filter(
+                DeviceControlLog.createdAt >= start_date,
+                DeviceControlLog.createdAt <= end_date)
+            if (device_id != "all"):
+                query = query.filter(DeviceControlLog.deviceId == device_id)
+            logs = query.all()
             logs_data = [log.get_data()
                          for log in logs] if len(logs) > 0 else []
             db.flush()
