@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import Column, Integer, Boolean, Numeric, Text, ForeignKey, DateTime, func, VARCHAR
+from sqlalchemy import Column, Integer, Boolean, Float, Text, ForeignKey, DateTime, func, VARCHAR
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -93,6 +93,7 @@ class Device(Base):
     startTime = Column(VARCHAR(10), nullable=True)
     offTime = Column(VARCHAR(10), nullable=True)
     scheduledBy = Column(Text, nullable=True)
+    wattage = Column(Float, nullable=True)
     createdAt = Column(DateTime(timezone=True),
                        server_default=func.now(), nullable=False)
     updatedAt = Column(DateTime(timezone=True), server_default=func.now(
@@ -110,11 +111,13 @@ class Device(Base):
         device.days_scheduled = str(
             self.daysScheduled) if self.daysScheduled is not None else None
         device.start_time = str(
-            self.startTime)if self.startTime is not None else None
+            self.startTime) if self.startTime is not None else None
         device.off_time = str(
-            self.offTime)if self.offTime is not None else None
+            self.offTime) if self.offTime is not None else None
         device.scheduled_by = str(
-            self.scheduledBy)if self.scheduledBy is not None else None
+            self.scheduledBy) if self.scheduledBy is not None else None
+        device.wattage = float(
+            str(self.wattage)) if self.wattage is not None else None
         device.created_at = str(self.createdAt)
         device.updated_at = str(self.updatedAt)
         return device
@@ -128,6 +131,7 @@ class DeviceControlLog(Base):
     statusChangedFrom = Column(Boolean, nullable=False)
     statusChangedTo = Column(Boolean, nullable=False)
     deviceId = Column(UUID(as_uuid=True), nullable=False)
+    deviceWattage = Column(Float, nullable=True)
     userId = Column(Text, nullable=False)
     createdAt = Column(DateTime(timezone=True),
                        server_default=func.now(), nullable=False)
@@ -138,9 +142,10 @@ class DeviceControlLog(Base):
         device_control_log = DeviceControlLogData()
         device_control_log.device_control_log_id = str(self.deviceControlLogId)
         device_control_log.device_id = str(self.deviceId)
+        device_control_log.device_wattage = float(str(self.deviceWattage))
         device_control_log.user_id = str(self.userId)
         device_control_log.status_changed_from = bool(self.statusChangedFrom)
         device_control_log.status_changed_to = bool(self.statusChangedTo)
-        device_control_log.created_at = str(self.createdAt)
-        device_control_log.updated_at = str(self.updatedAt)
+        device_control_log.created_at = self.createdAt.isoformat()
+        device_control_log.updated_at = self.updatedAt.isoformat()
         return device_control_log

@@ -23,6 +23,7 @@ class AddDeviceRequest(BaseModel):
     roomId: str
     pinNumber: int
     deviceName: str
+    wattage: float
 
 
 class SwitchDeviceRequest(BaseModel):
@@ -48,6 +49,7 @@ class ConfigureDeviceRequest(BaseModel):
     daysScheduled: str
     startTime: str
     offTime: str
+    wattage: float
 
 
 class RemoveDeviceRequest(BaseModel):

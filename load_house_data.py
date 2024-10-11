@@ -33,7 +33,7 @@ with open('data/house_data.json', 'r', encoding='utf-8') as f:
                     new_device = Device(deviceName=device["device_name"], pinNumber=device["pin_number"],
                                         roomId=room["room_id"], status=device["status"], isScheduled=device["is_scheduled"],
                                         isDefault=device["is_default"], daysScheduled=device["days_scheduled"], startTime=device[
-                                            "start_time"], offTime=device["off_time"], scheduledBy=device["scheduled_by"]
+                                            "start_time"], offTime=device["off_time"], scheduledBy=device["scheduled_by"], wattage=device["wattage"]
                                         )
                     db.add(new_device)
                     db.flush()
@@ -45,6 +45,8 @@ with open('data/house_data.json', 'r', encoding='utf-8') as f:
                                     new_log = DeviceControlLog(statusChangedFrom=log["status_changed_from"],
                                                                statusChangedTo=log["status_changed_to"],
                                                                deviceId=new_device.get_data().device_id,
+                                                               deviceWattage=float(
+                                                                   str(new_device.wattage)),
                                                                userId=log["user_id"])
                                     db.add(new_log)
                                     db.flush
