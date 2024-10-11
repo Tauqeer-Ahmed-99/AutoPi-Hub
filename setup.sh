@@ -52,7 +52,7 @@ After=network.target
 [Service]
 User=$USER_NAME
 WorkingDirectory=/home/$USER_NAME/AutoPi-Hub
-ExecStart=/home/$USER_NAME/AutoPi-Hub/venv/bin/python fastapi run server.py
+ExecStart=/home/$USER_NAME/AutoPi-Hub/venv/bin/uvicorn server:app --host 0.0.0.0 --port 8000 --ws websockets
 Restart=always
 RestartSec=3
 
