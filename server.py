@@ -872,7 +872,7 @@ async def get_energy_consumption(userId: str):
         "event": SocketEvents.ENERGY_CONSUMPTION_CALCULATED,
         "user_id": userId,
         "message": f"Energy Consumption calculated successfully.",
-        "data": content
+        "data": content["data"]
     }
 
     await socket_manager.broadcast(json.dumps(broadcast_data))
