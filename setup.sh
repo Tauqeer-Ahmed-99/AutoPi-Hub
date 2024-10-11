@@ -67,7 +67,7 @@ sudo systemctl enable autopihub
 # Start the FastAPI service
 # sudo systemctl start autopihub
 # Check the status of the FastAPI service
-sudo systemctl status autopihub
+# sudo systemctl status autopihub
 
 # Kill any process on port 8000
 sudo kill -9 `sudo lsof -t -i:8000`
