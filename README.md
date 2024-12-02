@@ -90,10 +90,18 @@ The AutoPi Hub Home Automation System provides a simple, secure, and flexible wa
 
    - After adding devices in the app, you need to physically wire the devices to the Raspberry Pi:
      - **Relay Wiring**: For example, to control a light or fan, wire a relay's:
-       - VCC to 5V power,
-       - GND to ground,
-       - IN to the GPIO pin selected in the app.
-     - **Relay to Switch Wiring**: Connect the relay’s Normally Open (NO) pin to the external switch, and the Common (COM) pin to the device (light/fan).
+         - VCC to 5V or 3v power (as per relay's rating),
+         - GND to ground,
+         - IN to the GPIO pin selected in the app.
+     - **Relay to Switch Wiring**: 
+         - Connect the relay’s Normally Closed (NC) pin to the external switch, then other end of the switch to device     (light/fan).
+         - Connect the relay's Normally Open (NO) pin directly to the same end of the device where switch is connected.
+         - Connect Other end of the device to Neutral connection of the electrical circuit.
+         - Common (COM) pin directly to the phase (Live) connection.
+     - **Electrical Schematic Diagram**:
+
+     ![Electrical Schematic Diagram](https://github.com/Tauqeer-Ahmed-99/Control-Nest/blob/master/assets/designs/Circuit%20Diagram.jpeg)
+
    - This wiring ensures the device can be controlled both manually and via the mobile app.
 
 4. **Control and Automate Devices**:
